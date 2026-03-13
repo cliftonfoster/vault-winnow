@@ -6,17 +6,37 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+	
+	  <!-- Single EXE defaults -->
+	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	<SelfContained>true</SelfContained>
+	<PublishSingleFile>true</PublishSingleFile>
   </PropertyGroup>
 
 	<PropertyGroup>
 		<Version>0.1.0-beta</Version>
 		<InformationalVersion>0.1.0-beta</InformationalVersion>
+		<ApplicationIcon>VaultWinnow.ico</ApplicationIcon>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="VaultWinnow.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="VaultWinnow.ico" />
+	</ItemGroup>
 
 
 
 	<ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
+
+
+
+	<ItemGroup>
+	  <Resource Include="VaultWinnow.ico" />
+	</ItemGroup>
 
 </Project>

@@ -14,12 +14,21 @@
   </PropertyGroup>
 
 	<PropertyGroup>
-		<Version>0.1.0-beta</Version>
-		<InformationalVersion>0.1.0-beta</InformationalVersion>
+		<Version>0.2.0-beta</Version>
+		<AssemblyVersion>0.2.0.0</AssemblyVersion>
+		<FileVersion>0.2.0.0</FileVersion>
+		<InformationalVersion>0.2.0-beta</InformationalVersion>
 		<ApplicationIcon>VaultWinnow.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Assets\Icons\check-clear.png" />
+	  <None Remove="Assets\Icons\check-select-all.png" />
+	  <None Remove="Assets\Icons\info.png" />
+	  <None Remove="Assets\Icons\json-append.png" />
+	  <None Remove="Assets\Icons\json-copy.png" />
+	  <None Remove="Assets\Icons\json-save.png" />
+	  <None Remove="Assets\Icons\open.png" />
 	  <None Remove="VaultWinnow.ico" />
 	</ItemGroup>
 
@@ -36,6 +45,27 @@
 
 
 	<ItemGroup>
+	  <Resource Include="Assets\Icons\check-clear.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\check-select-all.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\info.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\json-append.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\json-copy.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\json-save.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\open.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
 	  <Resource Include="VaultWinnow.ico" />
 	</ItemGroup>
 

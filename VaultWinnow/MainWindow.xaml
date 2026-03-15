@@ -4,7 +4,34 @@
         Title="VaultWinnow"
         Height="600" Width="950"
         WindowStartupLocation="CenterScreen">
-    
+
+    <Window.InputBindings>
+        <!-- Ctrl+O: Open JSON -->
+        <KeyBinding Modifiers="Control"
+                    Key="O"
+                    Command="{Binding OpenCommand}" />
+
+        <!-- Ctrl+E: Export Selected -->
+        <KeyBinding Modifiers="Control"
+                    Key="E"
+                    Command="{Binding ExportCommand}" />
+
+        <!-- Ctrl+C: Copy JSON -->
+        <KeyBinding Modifiers="Control"
+                    Key="C"
+                    Command="{Binding CopyCommand}" />
+
+        <!-- Ctrl+A: Select All (visible) -->
+        <KeyBinding Modifiers="Control"
+                    Key="A"
+                    Command="{Binding SelectAllCommand}" />
+
+        <!-- Ctrl+L: Clear Selection (visible) -->
+        <KeyBinding Modifiers="Control"
+                    Key="L"
+                    Command="{Binding ClearSelectionCommand}" />
+    </Window.InputBindings>
+
     <Window.Resources>
         <Style x:Key="ToolbarButtonStyle"
                TargetType="Button">
@@ -21,8 +48,28 @@
             <Setter Property="VerticalContentAlignment"
                     Value="Center" />
         </Style>
+        
+        <!-- New: icon + text style that builds on ToolbarButtonStyle -->
+        <Style x:Key="ToolbarIconButtonStyle"
+               TargetType="Button"
+               BasedOn="{StaticResource ToolbarButtonStyle}">
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="24"
+                                   Height="24"
+                                   Margin="0,0,4,0"
+                                   Source="{Binding RelativeSource={RelativeSource AncestorType=Button},
+                                            Path=Tag}" />
+                            <TextBlock Text="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
-    
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -35,52 +82,63 @@
         <!-- Toolbar Row -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
             <Button Name="BtnOpen"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Content="📂 Open JSON…"
-                    Height="28"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="/Assets/Icons/open.png"
+                    Content="Open"
+                    ToolTip="Open JSON File (CTRL+O)"
+                    Height="32"
                     Click="BtnOpen_Click" />
 
             <Button Name="BtnExport"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Content="💾 Export Selected…"
-                    Height="28"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="/Assets/Icons/json-save.png"
+                    Content="Export"
+                    ToolTip="Export JSON File (CTRL+E)"
+                    Height="32"
                     IsEnabled="False"
                     Click="BtnExport_Click" />
 
             <Button Name="BtnCopyToClipboard"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Content="📋 Copy JSON to Clipboard"
-                    Height="28"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="/Assets/Icons/json-copy.png"
+                    Content="Copy"
+                    ToolTip="Copy JSON to Clipboard (CTRL+C)"
+                    Height="32"
                     IsEnabled="False"
                     Click="BtnCopyToClipboard_Click" />
 
             <Button Name="BtnAppendToJson"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Content="➕ Append to JSON…"
-                    Height="28"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="/Assets/Icons/json-append.png"
+                    Content="Append"
+                    ToolTip="Append JSON to Existing File"
+                    Height="32"
                     IsEnabled="False"
                     Click="BtnAppendToJson_Click" />
 
             <Button Name="BtnSelectAll"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Content="Select All"
-                    Height="28"
-                    IsEnabled="False"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="/Assets/Icons/check-select-all.png"
+                    Content="Select"
+                    ToolTip="Select All Listed Items (CTRL+A)"
+                    Height="32"
                     Click="BtnSelectAll_Click" />
 
             <Button Name="BtnClearSelection"
-                    Style="{StaticResource ToolbarButtonStyle}"
-                    Content="Clear Selection"
-                    Height="28"
-                    IsEnabled="False"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="/Assets/Icons/check-clear.png"
+                    Content="Clear"
+                    ToolTip="Clear All Listed Items (CTRL+L)"
+                    Height="32"
                     Click="BtnClearSelection_Click" />
 
             <Button Name="BtnAbout"
-                    Style="{StaticResource ToolbarButtonStyle}"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="/Assets/Icons/info.png"
                     Content="About"
-                    Height="28"
+                    ToolTip="About VaultWinnow"
+                    Height="32"
                     Click="BtnAbout_Click" />
-
         </StackPanel>
 
         

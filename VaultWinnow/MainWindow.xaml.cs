@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
 using  VaultWinnow.Models;
@@ -20,6 +21,11 @@ namespace VaultWinnow
         private ObservableCollection<VaultItem> _items = new();
         private ICollectionView? _itemsView;
         private ItemTypeFilter _typeFilter = ItemTypeFilter.All;
+        public ICommand OpenCommand { get; }
+        public ICommand ExportCommand { get; }
+        public ICommand CopyCommand { get; }
+        public ICommand SelectAllCommand { get; }
+        public ICommand ClearSelectionCommand { get; }
 
 
         [Flags]
@@ -42,12 +48,25 @@ namespace VaultWinnow
             if (_itemsView != null)
                 _itemsView.Filter = ItemsFilter;
 
-            // Initial status bar state
+            // Commands for keyboard shortcuts
+            OpenCommand = new RelayCommand(_ => BtnOpen_Click(this, new RoutedEventArgs()),
+                                           _ => BtnOpen.IsEnabled);
+            ExportCommand = new RelayCommand(_ => BtnExport_Click(this, new RoutedEventArgs()),
+                                             _ => BtnExport.IsEnabled);
+            CopyCommand = new RelayCommand(_ => BtnCopyToClipboard_Click(this, new RoutedEventArgs()),
+                                           _ => BtnCopyToClipboard.IsEnabled);
+            SelectAllCommand = new RelayCommand(_ => BtnSelectAll_Click(this, new RoutedEventArgs()),
+                                                _ => BtnSelectAll.IsEnabled);
+            ClearSelectionCommand = new RelayCommand(_ => BtnClearSelection_Click(this, new RoutedEventArgs()),
+                                                     _ => BtnClearSelection.IsEnabled);
+
+            DataContext = this;
+
             if (TxtStatus != null)
             {
                 TxtStatus.Text = "No file loaded.";
                 TxtStatus.ToolTip = null;
-                TxtStatus.Foreground = System.Windows.Media.Brushes.Gray;
+                TxtStatus.Foreground = Brushes.Gray;
             }
 
             UpdateCount();
@@ -369,16 +388,28 @@ namespace VaultWinnow
         }
         private void BtnSelectAll_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var item in _items)
-                item.IsSelected = true;
+            if (_itemsView == null)
+                return;
+
+            foreach (var obj in _itemsView)
+            {
+                if (obj is VaultItem item)
+                    item.IsSelected = true;
+            }
 
             UpdateCount();
         }
 
         private void BtnClearSelection_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var item in _items)
-                item.IsSelected = false;
+            if (_itemsView == null)
+                return;
+
+            foreach (var obj in _itemsView)
+            {
+                if (obj is VaultItem item)
+                    item.IsSelected = false;
+            }
 
             UpdateCount();
         }
@@ -416,6 +447,29 @@ namespace VaultWinnow
         {
             UpdateTypeFilterFromCheckboxes();
         }
+
+        public class RelayCommand : ICommand
+        {
+            private readonly Action<object?> _execute;
+            private readonly Predicate<object?>? _canExecute;
+
+            public RelayCommand(Action<object?> execute, Predicate<object?>? canExecute = null)
+            {
+                _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+                _canExecute = canExecute;
+            }
+
+            public bool CanExecute(object? parameter) => _canExecute?.Invoke(parameter) ?? true;
+
+            public void Execute(object? parameter) => _execute(parameter);
+
+            public event EventHandler? CanExecuteChanged
+            {
+                add { CommandManager.RequerySuggested += value; }
+                remove { CommandManager.RequerySuggested -= value; }
+            }
+        }
+
 
     }
 }

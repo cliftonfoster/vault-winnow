@@ -27,6 +27,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -81,6 +82,7 @@
                     Click="BtnAbout_Click" />
 
         </StackPanel>
+
         
 
         <!-- Status Row -->
@@ -101,9 +103,44 @@
                        Foreground="Gray" />
         </StackPanel>
 
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Margin="0,0,0,4">
+            <TextBlock Text="Types:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,6,0" />
+
+            <CheckBox x:Name="ChkLogin"
+                      Content="Logins"
+                      IsChecked="True"
+                      Margin="0,0,6,0"
+                      Checked="TypeFilterCheckboxChanged"
+                      Unchecked="TypeFilterCheckboxChanged" />
+
+            <CheckBox x:Name="ChkSecureNote"
+                      Content="Secure Notes"
+                      IsChecked="True"
+                      Margin="0,0,6,0"
+                      Checked="TypeFilterCheckboxChanged"
+                      Unchecked="TypeFilterCheckboxChanged" />
+
+            <CheckBox x:Name="ChkCard"
+                      Content="Cards"
+                      IsChecked="True"
+                      Margin="0,0,6,0"
+                      Checked="TypeFilterCheckboxChanged"
+                      Unchecked="TypeFilterCheckboxChanged" />
+
+            <CheckBox x:Name="ChkIdentity"
+                      Content="Identities"
+                      IsChecked="True"
+                      Margin="0,0,6,0"
+                      Checked="TypeFilterCheckboxChanged"
+                      Unchecked="TypeFilterCheckboxChanged" />
+        </StackPanel>
 
         <!-- DataGrid -->
-        <DataGrid Grid.Row="2"
+        <DataGrid Grid.Row="3"
                   Name="ItemGrid"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
@@ -175,7 +212,7 @@
         </DataGrid>
 
         <!-- Footer -->
-        <TextBlock Grid.Row="3"
+        <TextBlock Grid.Row="4"
                    Name="TxtCount"
                    Text=""
                    Margin="0,6,0,0"

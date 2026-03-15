@@ -7,6 +7,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 using System.Xml;
 using  VaultWinnow.Models;
 using Formatting = Newtonsoft.Json.Formatting;
@@ -18,15 +19,40 @@ namespace VaultWinnow
         private VaultExport? _loadedExport;
         private ObservableCollection<VaultItem> _items = new();
         private ICollectionView? _itemsView;
+        private ItemTypeFilter _typeFilter = ItemTypeFilter.All;
+
+
+        [Flags]
+        public enum ItemTypeFilter
+        {
+            None = 0,
+            Login = 1,
+            SecureNote = 2,
+            Card = 4,
+            Identity = 8,
+            All = Login | SecureNote | Card | Identity
+        }
 
         public MainWindow()
         {
             InitializeComponent();
+
             ItemGrid.ItemsSource = _items;
             _itemsView = CollectionViewSource.GetDefaultView(_items);
             if (_itemsView != null)
                 _itemsView.Filter = ItemsFilter;
+
+            // Initial status bar state
+            if (TxtStatus != null)
+            {
+                TxtStatus.Text = "No file loaded.";
+                TxtStatus.ToolTip = null;
+                TxtStatus.Foreground = System.Windows.Media.Brushes.Gray;
+            }
+
+            UpdateCount();
         }
+
 
         private void BtnOpen_Click(object sender, RoutedEventArgs e)
         {
@@ -69,14 +95,28 @@ namespace VaultWinnow
             _items.Clear();
             foreach (var item in _loadedExport.Items)
                 _items.Add(item);
-
-            TxtStatus.Text = $"Loaded: {dlg.FileName}";
-            TxtStatus.Foreground = System.Windows.Media.Brushes.DarkGreen;
+            if (TxtStatus != null)
+            {
+                TxtStatus.Text = $"Loaded: {dlg.FileName}";
+                TxtStatus.ToolTip = dlg.FileName;
+                TxtStatus.Foreground = Brushes.DarkGreen;
+            }
             BtnExport.IsEnabled = true;
             BtnCopyToClipboard.IsEnabled = true;
             BtnAppendToJson.IsEnabled = true;
             BtnSelectAll.IsEnabled = true;
             BtnClearSelection.IsEnabled = true;
+
+            if (TxtStatus != null)
+            {
+                string fullPath = dlg.FileName;
+                string fileName = System.IO.Path.GetFileName(fullPath);
+
+                // Example: Loaded: vault.json
+                TxtStatus.Text = $"Loaded: {fileName}";
+                TxtStatus.ToolTip = fullPath;   // full path on hover
+                TxtStatus.Foreground = Brushes.Green;
+            }
 
             UpdateCount();
 
@@ -116,12 +156,23 @@ namespace VaultWinnow
 
         private void UpdateCount()
         {
-            var total = _items.Count;
-            var visible = _itemsView?.Cast<VaultItem>().Count() ?? total;
-            var selected = _items.Count(i => i.IsSelected);
+            int total = _items?.Count ?? 0;
 
-            TxtCount.Text = $"{selected} selected — {visible} visible of {total} total.";
+            int visible = total;
+            if (_itemsView != null)
+            {
+                visible = _itemsView.Cast<object>().Count();
+            }
+
+            int selected = _items?.Count(i => i.IsSelected) ?? 0;
+
+            if (TxtCount == null)
+                return; // XAML not initialized yet or window is closing
+
+            TxtCount.Text = $"{selected} selected  {visible} visible of {total} total";
         }
+
+
 
         private string? BuildFilteredExportJson()
         {
@@ -275,17 +326,41 @@ namespace VaultWinnow
             if (obj is not VaultItem item)
                 return false;
 
+            // Text search (your existing logic)
             var text = TxtSearch?.Text;
-            if (string.IsNullOrWhiteSpace(text))
-                return true;
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                text = text.Trim();
 
-            text = text.Trim();
+                var matchesText =
+                    (item.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (item.Username?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (item.PrimaryUri?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
+                    || (item.FolderName?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false);
 
-            return (item.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
-                || (item.Username?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
-                || (item.PrimaryUri?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
-                || (item.FolderName?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false);
+                if (!matchesText)
+                    return false;
+            }
+
+            // Type filter (new logic)
+            // If you haven't added the enum/field yet, see below.
+            string type = item.TypeLabel;
+
+            if (type == "Login" && !_typeFilter.HasFlag(ItemTypeFilter.Login))
+                return false;
+
+            if (type == "Secure Note" && !_typeFilter.HasFlag(ItemTypeFilter.SecureNote))
+                return false;
+
+            if (type == "Card" && !_typeFilter.HasFlag(ItemTypeFilter.Card))
+                return false;
+
+            if (type == "Identity" && !_typeFilter.HasFlag(ItemTypeFilter.Identity))
+                return false;
+
+            return true;
         }
+
         private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
         {
             _itemsView?.Refresh();
@@ -317,6 +392,30 @@ namespace VaultWinnow
             about.ShowDialog();
         }
 
+
+        private void UpdateTypeFilterFromCheckboxes()
+        {
+            ItemTypeFilter filter = ItemTypeFilter.None;
+
+            if (ChkLogin?.IsChecked == true)
+                filter |= ItemTypeFilter.Login;
+            if (ChkSecureNote?.IsChecked == true)
+                filter |= ItemTypeFilter.SecureNote;
+            if (ChkCard?.IsChecked == true)
+                filter |= ItemTypeFilter.Card;
+            if (ChkIdentity?.IsChecked == true)
+                filter |= ItemTypeFilter.Identity;
+
+            _typeFilter = filter == ItemTypeFilter.None ? ItemTypeFilter.All : filter;
+
+            _itemsView?.Refresh();
+            UpdateCount();
+        }
+
+        private void TypeFilterCheckboxChanged(object sender, RoutedEventArgs e)
+        {
+            UpdateTypeFilterFromCheckboxes();
+        }
 
     }
 }

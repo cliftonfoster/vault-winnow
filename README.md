@@ -31,15 +31,29 @@ few items”. VaultWinnow fills that gap:
   - Folder name
   - Indicators for TOTP (MFA) and passkeys (FIDO2 credentials)
 - **Search** as you type by name, username, URI, or folder name.
-- **Selection helpers**:
-  - Select All
-  - Clear Selection
+- **Type filters**:
+  - Quickly show only Logins, Secure Notes, Cards, or Identities.
+  - Footer counts reflect both search and type filters.
+- **Selection helpers** (respecting filters):
+  - Select All (selects only the currently visible, filtered items)
+  - Clear Selection (clears selection only for the visible, filtered items)
+- **Toolbar icons and tooltips**:
+  - Compact toolbar with icon+text buttons and descriptive tooltips for
+    Open, Export, Copy, Append, Select, Clear, and About.
+- **Keyboard shortcuts**:
+  - Ctrl+O – Open JSON
+  - Ctrl+E – Export Selected
+  - Ctrl+C – Copy JSON to Clipboard
+  - Ctrl+A – Select All (visible items)
+  - Ctrl+L – Clear Selection (visible items)
 - **Export options**:
   - Export selected items to a new JSON file.
   - Copy the export JSON directly to the clipboard (for Bitwarden’s paste box).
   - Append the current selection to an existing filtered JSON and save as a new file.
 - **Folder trimming**:
   - The exported JSON includes only folders that are actually used by the selected items.
+- **Status bar improvements**:
+  - Shows loaded file information with a tooltip that reveals the full path when hovered.
 
 All output is designed to remain import-compatible with Bitwarden / Vaultwarden’s
 JSON import.
@@ -48,7 +62,7 @@ JSON import.
 
 ## Screenshots
 
-![VaultWinnow01](VaultWinnow01.png)
+![VaultWinnow main window](screenshot-main.png)
 
 ---
 
@@ -68,13 +82,11 @@ JSON import.
    cd vault-winnow
    ```
 
-2. Open `VaultWinnow.sln` in Visual Studio 2022 (or later).
+1. Open `VaultWinnow.sln` in Visual Studio 2022 (or later).
+2. Restore NuGet packages (Visual Studio will usually do this on build).
+3. Set the configuration to `Release` or `Debug` as desired and press **F5** to run.
 
-3. Restore NuGet packages (Visual Studio will usually do this on build).
-
-4. Set the configuration to `Release` or `Debug` as desired and press **F5** to run.
-
----
+------
 
 ## Usage
 
@@ -86,30 +98,30 @@ JSON import.
 2. **Load the export**
 
    - Start VaultWinnow.
-   - Click **Open JSON…** and choose the exported vault file.
+   - Click **Open** (or press **Ctrl+O**) and choose the exported vault file.
    - The grid will populate with all items and folder names.
 
 3. **Filter and select**
 
    - Use the **Search** box to narrow by name, username, URI, or folder.
+   - Use the **Types** checkboxes to focus on Logins, Secure Notes, Cards, or Identities.
    - Tick the checkboxes for the items you want to keep.
-   - Use **Select All** / **Clear Selection** to adjust quickly.
+   - Use **Select** / **Clear** (or **Ctrl+A** / **Ctrl+L**) to adjust quickly; these operate
+      on the currently visible, filtered items.
    - The footer shows how many items are loaded, visible, and selected.
 
 4. **Export selected items**
 
    You have three options:
 
-   - **Export Selected…**  
-     Saves a new JSON file with only the selected items and their used folders.
-
-   - **Copy JSON to Clipboard**  
-     Builds the same JSON and copies it to the clipboard, ready to paste into
-     Bitwarden’s “Import from JSON (copy & paste)” box.
-
-   - **Append to JSON…**  
+   - **Export**
+      Saves a new JSON file with only the selected items and their used folders.
+   - **Copy**
+      Builds the same JSON and copies it to the clipboard, ready to paste into
+      Bitwarden’s “Import from JSON (copy & paste)” box.
+   - **Append**
      - Select the items you want to add.
-     - Click **Append to JSON…**.
+     - Click **Append**.
      - Choose an existing filtered JSON file (for example, a previous 25-item export).
      - Confirm the append when prompted.
      - Choose a new filename. The resulting file contains:
@@ -117,25 +129,25 @@ JSON import.
        - Plus the items you just selected.
        - With folders merged and deduplicated by ID.
 
----
+------
 
 ## Project Structure
 
-```text
-VaultWinnow/
+```
+textVaultWinnow/
 ├── Models/
 │   └── VaultModels.cs       # JSON models (VaultExport, VaultItem, login/card/identity/etc.)
-├── MainWindow.xaml          # Main UI: toolbar, search box, DataGrid
+├── MainWindow.xaml          # Main UI: toolbar, search box, type filters, DataGrid
 ├── MainWindow.xaml.cs       # Load, filter, select, export, copy, append logic
 ├── AboutWindow.xaml         # About dialog UI
-├── AboutWindow.xaml.cs      # About dialog logic (GitHub link, close handling)
+├── AboutWindow.xaml.cs      # About dialog logic (GitHub/Ko‑fi links, close handling)
 └── VaultWinnow.csproj       # WPF project file
 ```
 
 The JSON model layer is intentionally close to the Bitwarden/Vaultwarden export
-structure so that imports/exports remain compatible.
+ structure so that imports/exports remain compatible.
 
----
+------
 
 ## Security and Privacy
 
@@ -144,25 +156,24 @@ structure so that imports/exports remain compatible.
   - Writes JSON exports to disk or copies them to the clipboard.
   - No network calls are made.
 - Your vault data stays on your machine; still, exported JSON is sensitive and
-  should be deleted when no longer needed.
+   should be deleted when no longer needed.
 - Only **unencrypted** export files are supported. Encrypted exports must be
-  decrypted via Bitwarden/Vaultwarden before use.
+   decrypted via Bitwarden/Vaultwarden before use.
 
----
+------
 
 ## Roadmap / Ideas
 
 Planned or potential future enhancements:
 
-- Optional keyboard shortcuts (Ctrl+O, Ctrl+E, etc.).
-- More flexible type-aware filtering (e.g., show only Logins or only Notes).
 - Column sorting and column visibility toggles.
 - Additional export formats (KeePass, 1Password, etc.).
 - Per-item preview/details pane.
+- Dark mode and other visual themes.
 
 Suggestions and PRs for small, focused features that keep the app simple are welcome.
 
----
+------
 
 ## Contributing
 
@@ -173,17 +184,18 @@ Issues and pull requests are encouraged:
 3. Make your changes in small, focused commits.
 4. Open a pull request with a clear description of the change and rationale.
 
----
+------
 
 ## License
 
 This project is licensed under the **MIT License**. See the `LICENSE` file for details.
 
----
+------
 
 ## Support
 
-VaultWinnow is a small side project that I maintain in my free time. 
-If it’s useful to you and you’d like to say thanks, you can support me here:
+VaultWinnow is a small side project that I maintain in my free time.
+ If it’s useful to you and you’d like to say thanks, you can support me here:
 
 [☕ Support me on Ko‑fi](https://ko-fi.com/cliftonfoster)
+

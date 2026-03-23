@@ -128,6 +128,19 @@ namespace VaultWinnow.Models
         public bool HasPasskey =>
             Login?.Fido2Credentials is { Count: > 0 };
 
+        [JsonIgnore]
+        public int DuplicateGroupId { get; set; } = 0;
+
+        [JsonIgnore]
+        public bool HasDuplicateAnalysis { get; set; } = false;
+
+        [JsonIgnore]
+        public string DuplicateStatusDisplay =>
+            !HasDuplicateAnalysis
+                ? string.Empty
+                : DuplicateStatus.ToString();
+
+
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string name) =>

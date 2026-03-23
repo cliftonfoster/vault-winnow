@@ -100,7 +100,7 @@
             
             <Button Name="BtnAnalyzeDuplicates"
                     Style="{StaticResource ToolbarIconButtonStyle}"
-                    Tag="Assets/Icons/duplicates.png"
+                    Tag="Assets/Icons/analyze.png"
                     Content="Analyze"
                     ToolTip="Analyze logins for duplicates"
                     Height="32"
@@ -109,7 +109,7 @@
             
             <Button Name="BtnSelectStrictDuplicates"
                     Style="{StaticResource ToolbarIconButtonStyle}"
-                    Tag="Assets/Icons/select-duplicates.png"
+                    Tag="Assets/Icons/select-strict.png"
                     Content="Select Strict"
                     ToolTip="Select strict duplicates in the visible items (keep one per group)"
                     Height="32"
@@ -149,6 +149,15 @@
                     ToolTip="Clear All Listed Items (CTRL+L)"
                     Height="32"
                     Click="BtnClearSelection_Click" />
+
+            <Button Name="BtnInvertSelection"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="Assets/Icons/invert.png"
+                    Content="Invert"
+                    ToolTip="Invert selection for visible items"
+                    Height="32"
+                    IsEnabled="False"
+                    Click="BtnInvertSelectionClick" />
 
             <Button Name="BtnAbout"
                     Style="{StaticResource ToolbarIconButtonStyle}"
@@ -273,16 +282,21 @@
                                     IsReadOnly="True" />
                 <!-- Duplicate status: None / Strict / Almost -->
                 <DataGridTextColumn Header="Duplicate"
-                                    Binding="{Binding DuplicateStatus}"
+                                    Binding="{Binding DuplicateStatusDisplay}"
                                     Width="80"
                                     IsReadOnly="True" />
 
                 <!-- Group size: how many items share this duplicate group -->
-                <DataGridTextColumn Header="#"
+                <DataGridTextColumn Header="#Dupe"
                                     Binding="{Binding DuplicateGroupSize}"
-                                    Width="40"
+                                    Width="60"
                                     IsReadOnly="True" />
-                
+
+                <DataGridTextColumn Header="DupeGrp"
+                                    Binding="{Binding DuplicateGroupId}"
+                                    Width="80"
+                                    IsReadOnly="True" />
+
                 <DataGridTextColumn Header="Folder"
                                     Binding="{Binding FolderName}"
                                     MinWidth="90"

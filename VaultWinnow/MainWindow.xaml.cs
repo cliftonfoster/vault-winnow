@@ -27,6 +27,7 @@ namespace VaultWinnow
         public ICommand SelectAllCommand { get; }
         public ICommand ClearSelectionCommand { get; }
         private bool _showOnlyDuplicates;
+        private bool _hasDuplicateAnalysis;
 
 
 
@@ -129,6 +130,13 @@ namespace VaultWinnow
             BtnAppendToJson.IsEnabled = true;
             BtnSelectAll.IsEnabled = true;
             BtnClearSelection.IsEnabled = true;
+            BtnInvertSelection.IsEnabled = true;
+            _hasDuplicateAnalysis = false;
+            BtnAnalyzeDuplicates.IsEnabled = true;
+            BtnSelectStrictDuplicates.IsEnabled = false;
+            ChkShowOnlyDuplicates.IsEnabled = false;
+            ChkShowOnlyDuplicates.IsChecked = false;
+
 
 
             if (TxtStatus != null)
@@ -153,6 +161,14 @@ namespace VaultWinnow
             {
                 _itemsView.Filter = ItemsFilter;
                 _itemsView.Refresh();
+            }
+
+            foreach (var item in _items)
+            {
+                item.DuplicateStatus = DuplicateStatus.None;
+                item.DuplicateGroupSize = 0;
+                item.DuplicateGroupId = 0;
+                item.HasDuplicateAnalysis = false;
             }
 
         }
@@ -491,12 +507,27 @@ namespace VaultWinnow
             {
                 item.DuplicateStatus = DuplicateStatus.None;
                 item.DuplicateGroupSize = 0;
+                item.DuplicateGroupId = 0; // NEW
             }
+
 
             // Work only with login items that have a host/username/password
             var loginItems = _items
                 .Where(i => i.TypeLabel == "Login" && i.Login != null)
                 .ToList();
+
+            var groupKeyToId = new Dictionary<string, int>();
+            int nextGroupId = 1;
+
+            int GetGroupId(string key)
+            {   
+                if (!groupKeyToId.TryGetValue(key, out var id))
+                {
+                    id = nextGroupId++;
+                    groupKeyToId[key] = id;
+                }
+                return id;
+            }
 
             // Helper: normalize host from PrimaryUri
             string GetHost(string? uri)
@@ -530,12 +561,25 @@ namespace VaultWinnow
             foreach (var group in strictGroups)
             {
                 int size = group.Count();
+
+                // Build a key that ignores Name but captures host + username + password
+                // so related Almost items can share the same ID.
+                var any = group.First();
+                string hostKey = GetHost(any.PrimaryUri);
+                string userKey = (any.Username?.Trim().ToLowerInvariant() ?? string.Empty);
+                string passKey = any.Login?.Password ?? string.Empty;
+
+                string groupKey = $"{hostKey}|{userKey}|{passKey}";
+                int groupId = GetGroupId(groupKey);
+
                 foreach (var item in group)
                 {
                     item.DuplicateStatus = DuplicateStatus.Strict;
                     item.DuplicateGroupSize = size;
+                    item.DuplicateGroupId = groupId;
                 }
             }
+
 
             // Almost duplicates:
             // Same host; not strict; at least one of:
@@ -594,7 +638,14 @@ namespace VaultWinnow
                         if (!isAlmost)
                             continue;
 
-                        // Mark both as Almost if not already Strict
+                        // Shared key for group ID (same as above: host + username + password)
+                        var hostKey = GetHost(a.PrimaryUri);
+                        var userKey = userA; // already normalized
+                        var passKey = passA; // already captured above
+
+                        string groupKey = $"{hostKey}|{userKey}|{passKey}";
+                        int groupId = GetGroupId(groupKey);
+
                         void MarkAlmost(VaultItem item)
                         {
                             if (item.DuplicateStatus == DuplicateStatus.None)
@@ -602,16 +653,29 @@ namespace VaultWinnow
                                 item.DuplicateStatus = DuplicateStatus.Almost;
                                 item.DuplicateGroupSize = Math.Max(item.DuplicateGroupSize, 2);
                             }
+
+                            if (item.DuplicateGroupId == 0)
+                                item.DuplicateGroupId = groupId;
                         }
 
                         MarkAlmost(a);
                         MarkAlmost(b);
+
                     }
                 }
             }
 
+            _hasDuplicateAnalysis = true;
+            BtnSelectStrictDuplicates.IsEnabled = true;
+            ChkShowOnlyDuplicates.IsEnabled = true;
+
+            foreach (var item in _items)
+            {
+                item.HasDuplicateAnalysis = true;
+            }
             _itemsView?.Refresh();
             UpdateCount();
+
 
             MessageBox.Show(
                 "Duplicate analysis complete.\n\n" +
@@ -623,6 +687,9 @@ namespace VaultWinnow
 
         private void BtnSelectStrictDuplicatesClick(object sender, RoutedEventArgs e)
         {
+            if (!_hasDuplicateAnalysis) return;
+
+
             if (_itemsView == null)
                 return;
 
@@ -678,6 +745,8 @@ namespace VaultWinnow
 
         private void DuplicatesFilterChanged(object sender, RoutedEventArgs e)
         {
+            if (!_hasDuplicateAnalysis) return;
+
             _showOnlyDuplicates = ChkShowOnlyDuplicates?.IsChecked == true;
 
             if (_showOnlyDuplicates)
@@ -702,28 +771,47 @@ namespace VaultWinnow
 
             _itemsView.SortDescriptions.Clear();
 
-            // 1. Duplicate status: Strict before Almost
+            // 1. Strict before Almost
             _itemsView.SortDescriptions.Add(
                 new SortDescription(nameof(VaultItem.DuplicateStatus), ListSortDirection.Ascending));
 
-            // 2. Name (vault item name)
+            // 2. Group ID keeps related items adjacent
+            _itemsView.SortDescriptions.Add(
+                new SortDescription(nameof(VaultItem.DuplicateGroupId), ListSortDirection.Ascending));
+
+            // 3. Name
             _itemsView.SortDescriptions.Add(
                 new SortDescription(nameof(VaultItem.Name), ListSortDirection.Ascending));
 
-            // 3. Username
-            _itemsView.SortDescriptions.Add(
-                new SortDescription(nameof(VaultItem.Username), ListSortDirection.Ascending));
-
-            // 4. Primary URI (host/path)
+            // 4. Primary URI
             _itemsView.SortDescriptions.Add(
                 new SortDescription(nameof(VaultItem.PrimaryUri), ListSortDirection.Ascending));
 
-            // 5. Unselected listed first
+            // 5. Username
+            _itemsView.SortDescriptions.Add(
+                new SortDescription(nameof(VaultItem.Username), ListSortDirection.Ascending));
+
+            // 6. Unchecked first, then checked
             _itemsView.SortDescriptions.Add(
                 new SortDescription(nameof(VaultItem.IsSelected), ListSortDirection.Ascending));
         }
 
 
+        private void BtnInvertSelectionClick(object sender, RoutedEventArgs e)
+        {
+            if (_itemsView == null)
+                return;
+
+            foreach (var obj in _itemsView)
+            {
+                if (obj is VaultItem item)
+                {
+                    item.IsSelected = !item.IsSelected;
+                }
+            }
+
+            UpdateCount();
+        }
 
 
     }

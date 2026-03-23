@@ -5,13 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## Unreleased
 
 ### Added
 - 
 
 ### Changed
 - 
+
+### Fixed
+- 
+
+## 0.3.0-beta - 2026-03-22
+
+### Added
+- Duplicate analysis for Login items with three categories: Strict, Almost, and None.
+- Duplicate, group size, and group ID columns to surface analysis results in the main grid.
+- Analyze button to run duplicate analysis on the currently loaded vault.
+- Select Strict action that selects only strict duplicates in the visible view, keeping one item per group unselected.
+- Show only duplicates filter that narrows the grid to Strict and Almost items, combined with existing search and type filters.
+- Invert selection action that flips checkboxes for visible items, useful for exporting non-duplicates after selecting Strict.
+- Per-item flags and display logic so the Duplicate column is blank before analysis, then shows Strict/Almost/None afterward.
+
+### Changed
+- Strict duplicates now require matching name, host, username, password, notes, TOTP presence/value, and passkey presence.
+- Almost duplicates now include items that share host and credentials but differ in name, notes, TOTP, or passkeys, and are never auto-selected.
+- Duplicate items are grouped by a stable group ID derived from host + username + password so related Strict and Almost entries appear together in the grid.
+- Select and Clear helpers continue to operate only on the currently visible, filtered items. 
 
 ### Fixed
 - 

@@ -20,43 +20,50 @@ few items”. VaultWinnow fills that gap:
 ---
 
 ## Features
+ Load an unencrypted Bitwarden / Vaultwarden JSON export.
 
-- **Load** an unencrypted Bitwarden / Vaultwarden JSON export.
-- **View** all items in a grid:
-  - Select checkbox
-  - Type (Login, Secure Note, Card, Identity)
-  - Name
-  - Username
-  - Primary URI
-  - Folder name
-  - Indicators for TOTP (MFA) and passkeys (FIDO2 credentials)
-- **Search** as you type by name, username, URI, or folder name.
-- **Type filters**:
-  - Quickly show only Logins, Secure Notes, Cards, or Identities.
-  - Footer counts reflect both search and type filters.
-- **Selection helpers** (respecting filters):
-  - Select All (selects only the currently visible, filtered items)
-  - Clear Selection (clears selection only for the visible, filtered items)
-- **Toolbar icons and tooltips**:
-  - Compact toolbar with icon+text buttons and descriptive tooltips for
-    Open, Export, Copy, Append, Select, Clear, and About.
-- **Keyboard shortcuts**:
-  - Ctrl+O – Open JSON
-  - Ctrl+E – Export Selected
-  - Ctrl+C – Copy JSON to Clipboard
-  - Ctrl+A – Select All (visible items)
-  - Ctrl+L – Clear Selection (visible items)
-- **Export options**:
-  - Export selected items to a new JSON file.
-  - Copy the export JSON directly to the clipboard (for Bitwarden’s paste box).
-  - Append the current selection to an existing filtered JSON and save as a new file.
-- **Folder trimming**:
-  - The exported JSON includes only folders that are actually used by the selected items.
-- **Status bar improvements**:
-  - Shows loaded file information with a tooltip that reveals the full path when hovered.
+View all items in a grid:
 
-All output is designed to remain import-compatible with Bitwarden / Vaultwarden’s
-JSON import.
+- Select checkbox
+- Type (Login, Secure Note, Card, Identity)
+- Name
+- Username
+- Primary URI
+- Folder name
+- Indicators for TOTP (MFA) and passkeys (FIDO2 credentials)
+
+Search and filter:
+
+- Search as you type by name, username, URI, or folder name.
+- Type filters to quickly show only Logins, Secure Notes, Cards, or Identities.
+- Footer counts reflect both search and type filters.
+
+Selection helpers (respecting filters):
+
+- Select All (selects only the currently visible, filtered items).
+- Clear Selection (clears selection only for the visible, filtered items).
+- Invert Selection to flip checkboxes for all visible items.
+
+Duplicate analysis:
+
+- Analyze logins to classify entries as Strict, Almost, or None.
+- Duplicate and group columns show status, group size, and group ID for related entries.
+- Show only duplicates filter to focus on Strict/Almost items on top of existing search and type filters.
+- Select Strict action that selects strict duplicate copies in the visible view, keeping one item per group.
+
+Toolbar icons and shortcuts:VaultWinnow-Discusion-2.md+1
+
+- Compact toolbar with icon+text buttons and descriptive tooltips for Open, Export, Copy, Append, Select, Clear, Invert, Analyze, and About.
+- Keyboard shortcuts: Ctrl+O (Open JSON), Ctrl+E (Export Selected), Ctrl+C (Copy JSON), Ctrl+A (Select All visible), Ctrl+L (Clear Selection visible).
+
+Export options and safety:
+
+- Export selected items to a new JSON file.
+- Copy the export JSON directly to the clipboard (for Bitwarden’s paste box).
+- Append the current selection to an existing filtered JSON and save as a new file.
+- Folder trimming so the exported JSON includes only folders actually used by the selected items.
+- Status bar shows loaded file information with a tooltip revealing the full path on hover.
+- All output is designed to remain import-compatible with Bitwarden / Vaultwarden’s JSON import.
 
 ---
 

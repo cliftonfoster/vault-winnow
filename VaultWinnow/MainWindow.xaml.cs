@@ -26,6 +26,8 @@ namespace VaultWinnow
         public ICommand CopyCommand { get; }
         public ICommand SelectAllCommand { get; }
         public ICommand ClearSelectionCommand { get; }
+        private bool _showOnlyDuplicates;
+
 
 
         [Flags]
@@ -120,11 +122,14 @@ namespace VaultWinnow
                 TxtStatus.ToolTip = dlg.FileName;
                 TxtStatus.Foreground = Brushes.DarkGreen;
             }
+            BtnAnalyzeDuplicates.IsEnabled = true;
+            BtnSelectStrictDuplicates.IsEnabled = true;
             BtnExport.IsEnabled = true;
             BtnCopyToClipboard.IsEnabled = true;
             BtnAppendToJson.IsEnabled = true;
             BtnSelectAll.IsEnabled = true;
             BtnClearSelection.IsEnabled = true;
+
 
             if (TxtStatus != null)
             {
@@ -377,6 +382,9 @@ namespace VaultWinnow
             if (type == "Identity" && !_typeFilter.HasFlag(ItemTypeFilter.Identity))
                 return false;
 
+            if (_showOnlyDuplicates && item.DuplicateStatus == DuplicateStatus.None)
+                return false;
+
             return true;
         }
 
@@ -470,6 +478,254 @@ namespace VaultWinnow
             }
         }
 
+        private void BtnAnalyzeDuplicatesClick(object sender, RoutedEventArgs e)
+        {
+            if (_items == null || _items.Count == 0)
+            {
+                MessageBox.Show("No items loaded.", "Analyze duplicates", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Reset previous analysis  
+            foreach (var item in _items)
+            {
+                item.DuplicateStatus = DuplicateStatus.None;
+                item.DuplicateGroupSize = 0;
+            }
+
+            // Work only with login items that have a host/username/password
+            var loginItems = _items
+                .Where(i => i.TypeLabel == "Login" && i.Login != null)
+                .ToList();
+
+            // Helper: normalize host from PrimaryUri
+            string GetHost(string? uri)
+            {
+                if (string.IsNullOrWhiteSpace(uri))
+                    return string.Empty;
+
+                if (!Uri.TryCreate(uri, UriKind.Absolute, out var u))
+                    return uri.Trim();
+
+                return u.Host.ToLowerInvariant();
+            }
+
+            // Build strict groups: host + username + password + notes + TOTP + FIDO2 presence
+            var strictGroups = loginItems
+                .GroupBy(i => new
+                {
+                    Host = GetHost(i.PrimaryUri),
+                    Name = i.Name ?? string.Empty,  // NEW: include Name
+                    Username = i.Username?.Trim().ToLowerInvariant() ?? string.Empty,
+                    Password = i.Login?.Password ?? string.Empty,
+                    Notes = i.Notes ?? string.Empty,
+                    HasTotp = !string.IsNullOrWhiteSpace(i.Login?.Totp),
+                    HasPasskey = i.HasPasskey
+                })
+                .Where(g => g.Count() > 1)
+                .ToList();
+
+
+            // Mark strict duplicates
+            foreach (var group in strictGroups)
+            {
+                int size = group.Count();
+                foreach (var item in group)
+                {
+                    item.DuplicateStatus = DuplicateStatus.Strict;
+                    item.DuplicateGroupSize = size;
+                }
+            }
+
+            // Almost duplicates:
+            // Same host; not strict; at least one of:
+            // - same username & password but TOTP/notes/FIDO2 differ
+            // - same username, different password
+            // - same password, different username
+            var byHost = loginItems
+                .GroupBy(i => GetHost(i.PrimaryUri))
+                .Where(g => !string.IsNullOrEmpty(g.Key));
+
+            foreach (var hostGroup in byHost)
+            {
+                var list = hostGroup.ToList();
+                for (int i = 0; i < list.Count; i++)
+                {
+                    for (int j = i + 1; j < list.Count; j++)
+                    {
+                        var a = list[i];
+                        var b = list[j];
+
+                        // Skip pairs already marked strict
+                        if (a.DuplicateStatus == DuplicateStatus.Strict && b.DuplicateStatus == DuplicateStatus.Strict)
+                            continue;
+
+                        var userA = a.Username?.Trim().ToLowerInvariant() ?? string.Empty;
+                        var userB = b.Username?.Trim().ToLowerInvariant() ?? string.Empty;
+                        var passA = a.Login?.Password ?? string.Empty;
+                        var passB = b.Login?.Password ?? string.Empty;
+                        var notesA = a.Notes ?? string.Empty;
+                        var notesB = b.Notes ?? string.Empty;
+                        bool totpA = !string.IsNullOrWhiteSpace(a.Login?.Totp);
+                        bool totpB = !string.IsNullOrWhiteSpace(b.Login?.Totp);
+                        bool passkeyA = a.HasPasskey;
+                        bool passkeyB = b.HasPasskey;
+
+                        bool sameUser = userA == userB;
+                        bool samePass = passA == passB;
+
+                        // Same username/password but 2FA/notes differ
+                        bool sameCredsDifferentExtras =
+                            sameUser &&
+                            samePass &&
+                            (notesA != notesB ||
+                             totpA != totpB ||
+                             passkeyA != passkeyB ||
+                             !string.Equals(a.Name, b.Name, StringComparison.Ordinal));
+
+                        // Same host + same username, different password
+                        bool sameUserDifferentPass = sameUser && passA != passB;
+
+                        // Same host + same password, different username
+                        bool samePassDifferentUser = samePass && userA != userB;
+
+                        bool isAlmost = sameCredsDifferentExtras || sameUserDifferentPass || samePassDifferentUser;
+
+                        if (!isAlmost)
+                            continue;
+
+                        // Mark both as Almost if not already Strict
+                        void MarkAlmost(VaultItem item)
+                        {
+                            if (item.DuplicateStatus == DuplicateStatus.None)
+                            {
+                                item.DuplicateStatus = DuplicateStatus.Almost;
+                                item.DuplicateGroupSize = Math.Max(item.DuplicateGroupSize, 2);
+                            }
+                        }
+
+                        MarkAlmost(a);
+                        MarkAlmost(b);
+                    }
+                }
+            }
+
+            _itemsView?.Refresh();
+            UpdateCount();
+
+            MessageBox.Show(
+                "Duplicate analysis complete.\n\n" +
+                "Use the Duplicate and # columns, plus filters, to review results.",
+                "Analyze duplicates",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+
+        private void BtnSelectStrictDuplicatesClick(object sender, RoutedEventArgs e)
+        {
+            if (_itemsView == null)
+                return;
+
+            // Group visible strict duplicates by the same strict key used in analysis
+            string GetHost(string? uri)
+            {
+                if (string.IsNullOrWhiteSpace(uri))
+                    return string.Empty;
+
+                if (!Uri.TryCreate(uri, UriKind.Absolute, out var u))
+                    return uri.Trim();
+
+                return u.Host.ToLowerInvariant();
+            }
+
+            var visibleStrict = _itemsView
+                .Cast<object>()
+                .OfType<VaultItem>()
+                .Where(i =>
+                    i.DuplicateStatus == DuplicateStatus.Strict &&
+                    i.TypeLabel == "Login" &&
+                    i.Login != null)
+                .GroupBy(i => new
+                {
+                    Host = GetHost(i.PrimaryUri),
+                    Name = i.Name ?? string.Empty,  // NEW: include Name
+                    Username = i.Username?.Trim().ToLowerInvariant() ?? string.Empty,
+                    Password = i.Login?.Password ?? string.Empty,
+                    Notes = i.Notes ?? string.Empty,
+                    HasTotp = !string.IsNullOrWhiteSpace(i.Login?.Totp),
+                    HasPasskey = i.HasPasskey
+                });
+
+
+            foreach (var group in visibleStrict)
+            {
+                // Choose one to keep unselected; here: the first in the group
+                var itemsInGroup = group.ToList();
+                if (itemsInGroup.Count <= 1)
+                    continue;
+
+                // Clear selection for all first
+                foreach (var item in itemsInGroup)
+                    item.IsSelected = false;
+
+                // Keep the first unselected, select the rest as "safe duplicates"
+                for (int i = 1; i < itemsInGroup.Count; i++)
+                    itemsInGroup[i].IsSelected = true;
+            }
+
+            UpdateCount();
+        }
+
+        private void DuplicatesFilterChanged(object sender, RoutedEventArgs e)
+        {
+            _showOnlyDuplicates = ChkShowOnlyDuplicates?.IsChecked == true;
+
+            if (_showOnlyDuplicates)
+            {
+                ApplyDuplicateSorting();
+            }
+            else
+            {
+                // Optional: clear duplicate-centric sorts; you can restore a default or leave as-is
+                _itemsView?.SortDescriptions.Clear();
+            }
+
+            _itemsView?.Refresh();
+            UpdateCount();
+        }
+
+
+        private void ApplyDuplicateSorting()
+        {
+            if (_itemsView == null)
+                return;
+
+            _itemsView.SortDescriptions.Clear();
+
+            // 1. Duplicate status: Strict before Almost
+            _itemsView.SortDescriptions.Add(
+                new SortDescription(nameof(VaultItem.DuplicateStatus), ListSortDirection.Ascending));
+
+            // 2. Name (vault item name)
+            _itemsView.SortDescriptions.Add(
+                new SortDescription(nameof(VaultItem.Name), ListSortDirection.Ascending));
+
+            // 3. Username
+            _itemsView.SortDescriptions.Add(
+                new SortDescription(nameof(VaultItem.Username), ListSortDirection.Ascending));
+
+            // 4. Primary URI (host/path)
+            _itemsView.SortDescriptions.Add(
+                new SortDescription(nameof(VaultItem.PrimaryUri), ListSortDirection.Ascending));
+
+            // 5. Unselected listed first
+            _itemsView.SortDescriptions.Add(
+                new SortDescription(nameof(VaultItem.IsSelected), ListSortDirection.Ascending));
+        }
+
+
+
 
     }
+
 }

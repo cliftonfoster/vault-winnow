@@ -95,6 +95,13 @@ namespace VaultWinnow.Models
         // --- UI-only helpers, excluded from JSON output ---
 
         [JsonIgnore]
+        public DuplicateStatus DuplicateStatus { get; set; } = DuplicateStatus.None;
+
+        [JsonIgnore]
+        public int DuplicateGroupSize { get; set; } = 0;
+
+
+        [JsonIgnore]
         private bool _isSelected;
 
         [JsonIgnore]
@@ -294,5 +301,11 @@ namespace VaultWinnow.Models
 
         [JsonProperty("creationDate")]
         public string? CreationDate { get; set; }
+    }
+        public enum DuplicateStatus
+    {
+        None,
+        Strict,
+        Almost
     }
 }

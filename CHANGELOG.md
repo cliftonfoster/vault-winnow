@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-- 
+- Added a new `VaultWinnow.Tests` xUnit project with initial unit tests for Strict and Almost duplicate detection on Login items.
 
 ### Changed
-- 
+- Extracted duplicate analysis logic into a dedicated `DuplicateAnalyzer` helper class for easier maintenance and testing.
 
 ### Fixed
 - 

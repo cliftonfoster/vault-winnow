@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="VaultWinnow.Tests/VaultWinnow.Tests.csproj" Id="7f7f6990-3022-4047-a6dc-911b627d3ec1" />
   <Project Path="VaultWinnow/VaultWinnow.csproj" />
 </Solution>

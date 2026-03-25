@@ -7,10 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 	
-	  <!-- Single EXE defaults -->
-	<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-	<SelfContained>true</SelfContained>
-	<PublishSingleFile>true</PublishSingleFile>
+	  <!-- Removed RuntimeIdentifier / SelfContained / PublishSingleFile so the build is MSIL and RID-agnostic -->
   </PropertyGroup>
 
 	<PropertyGroup>

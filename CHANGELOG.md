@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Extracted duplicate analysis logic into a dedicated `DuplicateAnalyzer` helper class for easier maintenance and testing.
+- Duplicate analysis now has automated tests for core scenarios.
 
 ### Fixed
 - 

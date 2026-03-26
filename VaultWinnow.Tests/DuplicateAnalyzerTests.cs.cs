@@ -280,6 +280,155 @@ namespace VaultWinnow.Tests
             Assert.Equal(items[0].DuplicateGroupId, items[2].DuplicateGroupId);
         }
 
+        [Fact]
+        public void AnalyzeDuplicates_Marks_Almost_When_Totp_Differs()
+        {
+            var items = new List<VaultItem>
+    {
+        new VaultItem
+        {
+            Type = 1,
+            Name = "Example",
+            Login = new VaultLogin
+            {
+                Username = "user@example.com",
+                Password = "P@ssw0rd",
+                Totp = "otpauth://totp/Example?secret=AAA",
+                Uris = new List<VaultUri>
+                {
+                    new VaultUri { Uri = "https://example.com/login" }
+                }
+            },
+            Notes = "Some notes"
+        },
+        new VaultItem
+        {
+            Type = 1,
+            Name = "Example",
+            Login = new VaultLogin
+            {
+                Username = "user@example.com",
+                Password = "P@ssw0rd",
+                Totp = "otpauth://totp/Example?secret=BBB", // different TOTP
+                Uris = new List<VaultUri>
+                {
+                    new VaultUri { Uri = "https://example.com/login" }
+                }
+            },
+            Notes = "Some notes"
+        }
+    };
+
+            DuplicateAnalyzer.AnalyzeDuplicates(items);
+
+            Assert.Equal(DuplicateStatus.Almost, items[0].DuplicateStatus);
+            Assert.Equal(DuplicateStatus.Almost, items[1].DuplicateStatus);
+            Assert.Equal(items[0].DuplicateGroupId, items[1].DuplicateGroupId);
+            Assert.True(items[0].DuplicateGroupSize >= 2);
+        }
+
+        [Fact]
+        public void AnalyzeDuplicates_Marks_Almost_When_Notes_Differ()
+        {
+            var items = new List<VaultItem>
+    {
+        new VaultItem
+        {
+            Type = 1,
+            Name = "Example",
+            Login = new VaultLogin
+            {
+                Username = "user@example.com",
+                Password = "P@ssw0rd",
+                Totp = string.Empty,
+                Uris = new List<VaultUri>
+                {
+                    new VaultUri { Uri = "https://example.com/login" }
+                }
+            },
+            Notes = "Notes A"
+        },
+        new VaultItem
+        {
+            Type = 1,
+            Name = "Example",
+            Login = new VaultLogin
+            {
+                Username = "user@example.com",
+                Password = "P@ssw0rd",
+                Totp = string.Empty,
+                Uris = new List<VaultUri>
+                {
+                    new VaultUri { Uri = "https://example.com/login" }
+                }
+            },
+            Notes = "Notes B" // different
+        }
+    };
+
+            DuplicateAnalyzer.AnalyzeDuplicates(items);
+
+            Assert.Equal(DuplicateStatus.Almost, items[0].DuplicateStatus);
+            Assert.Equal(DuplicateStatus.Almost, items[1].DuplicateStatus);
+            Assert.Equal(items[0].DuplicateGroupId, items[1].DuplicateGroupId);
+            Assert.True(items[0].DuplicateGroupSize >= 2);
+        }
+
+        [Fact]
+        public void AnalyzeDuplicates_Should_Treat_Passkey_Differences_As_Almost()
+        {
+            var withPasskey = new VaultItem
+            {
+                Type = 1,
+                Name = "Example",
+                Login = new VaultLogin
+                {
+                    Username = "user@example.com",
+                    Password = "P@ssw0rd",
+                    Totp = string.Empty,
+                    Uris = new List<VaultUri>
+            {
+                new VaultUri { Uri = "https://example.com/login" }
+            },
+                    Fido2Credentials = new List<VaultFido2Credential>
+            {
+                new VaultFido2Credential
+                {
+                    CredentialId = "id-1",
+                    KeyType = "public-key"
+                }
+            }
+                },
+                Notes = "Some notes"
+            };
+
+            var withoutPasskey = new VaultItem
+            {
+                Type = 1,
+                Name = "Example",
+                Login = new VaultLogin
+                {
+                    Username = "user@example.com",
+                    Password = "P@ssw0rd",
+                    Totp = string.Empty,
+                    Uris = new List<VaultUri>
+            {
+                new VaultUri { Uri = "https://example.com/login" }
+            },
+                    Fido2Credentials = null // no passkeys
+                },
+                Notes = "Some notes"
+            };
+
+            var items = new List<VaultItem> { withPasskey, withoutPasskey };
+
+            DuplicateAnalyzer.AnalyzeDuplicates(items);
+
+            // Ideal/desired behavior (may fail until we adjust logic):
+            Assert.Equal(DuplicateStatus.Almost, items[0].DuplicateStatus);
+            Assert.Equal(DuplicateStatus.Almost, items[1].DuplicateStatus);
+        }
+
 
 
     }

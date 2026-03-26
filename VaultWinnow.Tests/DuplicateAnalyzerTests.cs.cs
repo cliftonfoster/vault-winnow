@@ -429,6 +429,32 @@ namespace VaultWinnow.Tests
             Assert.Equal(DuplicateStatus.Almost, items[1].DuplicateStatus);
         }
 
+        [Fact]
+        public void AnalyzeDuplicates_Ignores_Items_Without_Login_Data()
+        {
+            var items = new List<VaultItem>
+    {
+        new VaultItem
+        {
+            Type = 2,           // Secure Note
+            Name = "Note item",
+            Notes = "Just a note"
+            // Login is null
+        },
+        new VaultItem
+        {
+            Type = 1,           // Login, but no Login object
+            Name = "Broken login",
+            Login = null
+        }
+    };
+
+            DuplicateAnalyzer.AnalyzeDuplicates(items);
+
+            Assert.Equal(DuplicateStatus.None, items[0].DuplicateStatus);
+            Assert.Equal(DuplicateStatus.None, items[1].DuplicateStatus);
+        }
+
 
 
     }

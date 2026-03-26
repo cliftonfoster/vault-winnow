@@ -66,15 +66,16 @@ namespace VaultWinnow // use the same namespace as VaultItem
                 .GroupBy(i => new
                 {
                     Host = GetHost(i.PrimaryUri),
-                    Name = i.Name ?? string.Empty,  // NEW: include Name
+                    Name = i.Name ?? string.Empty,
                     Username = i.Username?.Trim().ToLowerInvariant() ?? string.Empty,
                     Password = i.Login?.Password ?? string.Empty,
                     Notes = i.Notes ?? string.Empty,
-                    HasTotp = !string.IsNullOrWhiteSpace(i.Login?.Totp),
+                    Totp = i.Login?.Totp ?? string.Empty,        // CHANGED: use value
                     HasPasskey = i.HasPasskey
                 })
                 .Where(g => g.Count() > 1)
                 .ToList();
+
 
 
             // Mark strict duplicates
@@ -137,15 +138,19 @@ namespace VaultWinnow // use the same namespace as VaultItem
 
                         bool sameUser = userA == userB;
                         bool samePass = passA == passB;
+                        var totpValueA = a.Login?.Totp ?? string.Empty;
+                        var totpValueB = b.Login?.Totp ?? string.Empty;
 
                         // Same username/password but 2FA/notes differ
                         bool sameCredsDifferentExtras =
                             sameUser &&
                             samePass &&
-                            (notesA != notesB ||
-                             totpA != totpB ||
-                             passkeyA != passkeyB ||
-                             !string.Equals(a.Name, b.Name, StringComparison.Ordinal));
+                            (
+                                notesA != notesB ||
+                                !string.Equals(totpValueA, totpValueB, StringComparison.Ordinal) ||
+                                passkeyA != passkeyB ||
+                                !string.Equals(a.Name, b.Name, StringComparison.Ordinal)
+                            );
 
                         // Same host + same username, different password
                         bool sameUserDifferentPass = sameUser && passA != passB;

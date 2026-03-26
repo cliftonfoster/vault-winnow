@@ -1,0 +1,47 @@
+﻿<Window x:Class="VaultWinnow.DuplicateHelpWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Duplicate Analysis Help"
+        SizeToContent="Height"
+        Width="520"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterOwner">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="How duplicate analysis works"
+                   FontWeight="Bold"
+                   FontSize="14" />
+
+        <TextBlock Grid.Row="1"
+                   Margin="0,10,0,10"
+                   TextWrapping="Wrap">
+            <Run Text="Strict:" />
+            <Run Text=" Same site, name, username, password, notes, 2FA/TOTP, and passkeys. Safe to auto-select duplicates (one is kept, the rest can be removed)." />
+            <LineBreak />
+            <LineBreak />
+            <Run Text="Almost:" />
+            <Run Text=" Same site but something important is different (name, password, notes, 2FA/TOTP, or passkeys). Always review these manually." />
+            <LineBreak />
+            <LineBreak />
+            <Run Text="None:" />
+            <Run Text=" Everything else, including reused passwords on different sites and non-login items. These are not treated as duplicates." />
+        </TextBlock>
+
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right">
+            <Button Width="80"
+                    Height="26"
+                    Margin="0,10,0,0"
+                    IsDefault="True"
+                    Content="Close"
+                    Click="BtnCloseClick" />
+        </StackPanel>
+    </Grid>
+</Window>
+

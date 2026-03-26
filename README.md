@@ -44,16 +44,17 @@ Selection helpers (respecting filters):
 - Clear Selection (clears selection only for the visible, filtered items).
 - Invert Selection to flip checkboxes for all visible items.
 
-Duplicate analysis:
+Duplicate analysis for logins:
 
-- Analyze logins to classify entries as Strict, Almost, or None.
-- Duplicate and group columns show status, group size, and group ID for related entries.
-- Show only duplicates filter to focus on Strict/Almost items on top of existing search and type filters.
-- Select Strict action that selects strict duplicate copies in the visible view, keeping one item per group.
+- Labels each login as **Strict**, **Almost**, or **None** without changing Bitwarden’s JSON format.
+- **Strict** = same site, name, username, password, notes, TOTP, and passkeys; safe to auto-select duplicates (one kept, the rest can be removed).
+- **Almost** = same site but important details differ (name, password, notes, 2FA/TOTP, or passkeys); always review manually.
+- **None** = everything else, including reused passwords on different sites and non-login items.
+- A “Dup Help” button in the toolbar opens a small window summarizing these rules.
 
-Toolbar icons and shortcuts:VaultWinnow-Discusion-2.md+1
+Toolbar icons and shortcuts:
 
-- Compact toolbar with icon+text buttons and descriptive tooltips for Open, Export, Copy, Append, Select, Clear, Invert, Analyze, and About.
+- Compact toolbar with icon+text buttons and descriptive tooltips for Open, Export, Copy, Append, Select, Clear, Invert, Analyze (duplicate analysis), Dup Help, and About.
 - Keyboard shortcuts: Ctrl+O (Open JSON), Ctrl+E (Export Selected), Ctrl+C (Copy JSON), Ctrl+A (Select All visible), Ctrl+L (Clear Selection visible).
 
 Export options and safety:
@@ -147,7 +148,10 @@ textVaultWinnow/
 ├── MainWindow.xaml          # Main UI: toolbar, search box, type filters, DataGrid
 ├── MainWindow.xaml.cs       # Load, filter, select, export, copy, append logic
 ├── AboutWindow.xaml         # About dialog UI
-├── AboutWindow.xaml.cs      # About dialog logic (GitHub/Ko‑fi links, close handling)
+├── AboutWindow.xaml.cs      # About dialog logic (GitHub/Ko‑fi links) 
+├── DuplicateHelpWindow.xaml     # Duplicate analysis help dialog UI
+├── DuplicateHelpWindow.xaml.cs  # Help dialog logic
+handling)
 └── VaultWinnow.csproj       # WPF project file
 ```
 

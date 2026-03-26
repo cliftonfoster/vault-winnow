@@ -106,6 +106,15 @@
                     Height="32"
                     IsEnabled="False"
                     Click="BtnAnalyzeDuplicatesClick" />
+
+            <Button Name="BtnDuplicateHelp"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="Assets/Icons/message-question.png"
+                    Content="Dup Help"
+                    ToolTip="Explain Strict / Almost duplicate analysis"
+                    Height="32"
+                    Click="BtnDuplicateHelpClick" />
+
             
             <Button Name="BtnSelectStrictDuplicates"
                     Style="{StaticResource ToolbarIconButtonStyle}"

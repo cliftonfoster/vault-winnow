@@ -27,6 +27,7 @@
 	  <None Remove="Assets\Icons\json-append.png" />
 	  <None Remove="Assets\Icons\json-copy.png" />
 	  <None Remove="Assets\Icons\json-save.png" />
+	  <None Remove="Assets\Icons\message-question.png" />
 	  <None Remove="Assets\Icons\open.png" />
 	  <None Remove="Assets\Icons\select-strict.png" />
 	  <None Remove="VaultWinnow.ico" />
@@ -67,6 +68,9 @@
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Assets\Icons\json-save.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\message-question.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Assets\Icons\open.png">

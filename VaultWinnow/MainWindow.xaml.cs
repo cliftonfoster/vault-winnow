@@ -518,6 +518,15 @@ namespace VaultWinnow
                 MessageBoxImage.Information);
         }
 
+        private void BtnDuplicateHelpClick(object sender, RoutedEventArgs e)
+        {
+            var window = new DuplicateHelpWindow
+            {
+                Owner = this
+            };
+            window.ShowDialog();
+        }
+
 
         private void BtnSelectStrictDuplicatesClick(object sender, RoutedEventArgs e)
         {

@@ -11,8 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a new `VaultWinnow.Tests` xUnit project with initial unit tests for Strict and Almost duplicate detection on Login items.
 
 ### Changed
-- Extracted duplicate analysis logic into a dedicated `DuplicateAnalyzer` helper class for easier maintenance and testing.
-- Duplicate analysis now has automated tests for core scenarios.
+- Refactored duplicate detection into a dedicated `DuplicateAnalyzer` helper class, independent of the WPF UI.
+- Added a `VaultWinnow.Tests` xUnit project with tests covering Strict, Almost, non-duplicates, and mixed groups for login items.
+- Tightened duplicate rules so TOTP value differences and passkey differences are treated as Almost, never Strict.
+- Added a “Dup Help” toolbar button and Duplicate Analysis Help window explaining Strict / Almost / None behavior.
 
 ### Fixed
 - 

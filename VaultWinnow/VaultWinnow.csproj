@@ -30,6 +30,7 @@
 	  <None Remove="Assets\Icons\message-question.png" />
 	  <None Remove="Assets\Icons\open.png" />
 	  <None Remove="Assets\Icons\select-strict.png" />
+	  <None Remove="Assets\VaultWinnowLogo.png" />
 	  <None Remove="VaultWinnow.ico" />
 	</ItemGroup>
 
@@ -77,6 +78,9 @@
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Assets\Icons\select-strict.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\VaultWinnowLogo.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="VaultWinnow.ico" />

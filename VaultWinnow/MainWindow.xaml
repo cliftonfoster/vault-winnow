@@ -48,7 +48,7 @@
             <Setter Property="VerticalContentAlignment"
                     Value="Center" />
         </Style>
-        
+
         <!-- New: icon + text style that builds on ToolbarButtonStyle -->
         <Style x:Key="ToolbarIconButtonStyle"
                TargetType="Button"
@@ -97,7 +97,7 @@
                     Height="32"
                     IsEnabled="False"
                     Click="BtnExport_Click" />
-            
+
             <Button Name="BtnAnalyzeDuplicates"
                     Style="{StaticResource ToolbarIconButtonStyle}"
                     Tag="Assets/Icons/analyze.png"
@@ -115,7 +115,6 @@
                     Height="32"
                     Click="BtnDuplicateHelpClick" />
 
-            
             <Button Name="BtnSelectStrictDuplicates"
                     Style="{StaticResource ToolbarIconButtonStyle}"
                     Tag="Assets/Icons/select-strict.png"
@@ -177,8 +176,6 @@
                     Click="BtnAbout_Click" />
         </StackPanel>
 
-        
-
         <!-- Status Row -->
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
@@ -189,7 +186,7 @@
             <TextBox Name="TxtSearch"
                      Width="220"
                      TextChanged="TxtSearch_TextChanged" />
-                     
+
             <TextBlock Name="TxtStatus"
                        Text="No file loaded."
                        Margin="12,0,0,0"
@@ -231,101 +228,123 @@
                       Margin="0,0,6,0"
                       Checked="TypeFilterCheckboxChanged"
                       Unchecked="TypeFilterCheckboxChanged" />
-            
+
             <CheckBox x:Name="ChkShowOnlyDuplicates"
                       Content="Show only duplicates"
                       Margin="12,0,0,0"
                       Checked="DuplicatesFilterChanged"
                       Unchecked="DuplicatesFilterChanged" />
-
         </StackPanel>
 
-        <!-- DataGrid -->
-        <DataGrid Grid.Row="3"
-                  Name="ItemGrid"
-                  AutoGenerateColumns="False"
-                  CanUserAddRows="False"
-                  CanUserDeleteRows="False"
-                  IsReadOnly="False"
-                  SelectionMode="Single"
-                  GridLinesVisibility="Horizontal"
-                  AlternatingRowBackground="#F5F5F5">
+        <!-- DataGrid with watermark -->
+        <Grid Grid.Row="3">
+            <DataGrid Name="ItemGrid"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      IsReadOnly="False"
+                      SelectionMode="Single"
+                      GridLinesVisibility="Horizontal"
+                      AlternatingRowBackground="#F5F5F5">
 
-            <DataGrid.Columns>
+                <DataGrid.Columns>
 
-                <!-- Checkbox column – uses TemplateColumn so one click works -->
-                <DataGridTemplateColumn Header="✔" Width="40" CanUserSort="False">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsSelected,
-                                        Mode=TwoWay,
-                                        UpdateSourceTrigger=PropertyChanged}"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
+                    <!-- Checkbox column – uses TemplateColumn so one click works -->
+                    <DataGridTemplateColumn Header="✔" Width="40" CanUserSort="False">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected,
+                                            Mode=TwoWay,
+                                            UpdateSourceTrigger=PropertyChanged}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
-                <DataGridTextColumn Header="Name"
-                                    Binding="{Binding Name}"
-                                    MinWidth="180"
-                                    Width="*"
-                                    IsReadOnly="True" />
+                    <DataGridTextColumn Header="Name"
+                                        Binding="{Binding Name}"
+                                        MinWidth="180"
+                                        Width="*"
+                                        IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Username"
-                                    Binding="{Binding Username}"
-                                    MinWidth="150"
-                                    Width="*"
-                                    IsReadOnly="True" />
+                    <DataGridTextColumn Header="Username"
+                                        Binding="{Binding Username}"
+                                        MinWidth="150"
+                                        Width="*"
+                                        IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Primary URI"
-                                    Binding="{Binding PrimaryUri}"
-                                    MinWidth="220"
-                                    Width="2*"
-                                    IsReadOnly="True" />
+                    <DataGridTextColumn Header="Primary URI"
+                                        Binding="{Binding PrimaryUri}"
+                                        MinWidth="220"
+                                        Width="2*"
+                                        IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Type"
-                                    Binding="{Binding TypeLabel}"
-                                    MinWidth="90"
-                                    Width="*"
-                                    IsReadOnly="True" />
-                <!-- Duplicate status: None / Strict / Almost -->
-                <DataGridTextColumn Header="Duplicate"
-                                    Binding="{Binding DuplicateStatusDisplay}"
-                                    Width="80"
-                                    IsReadOnly="True" />
+                    <DataGridTextColumn Header="Type"
+                                        Binding="{Binding TypeLabel}"
+                                        MinWidth="90"
+                                        Width="*"
+                                        IsReadOnly="True" />
 
-                <!-- Group size: how many items share this duplicate group -->
-                <DataGridTextColumn Header="#Dupe"
-                                    Binding="{Binding DuplicateGroupSize}"
-                                    Width="60"
-                                    IsReadOnly="True" />
+                    <!-- Duplicate status: None / Strict / Almost -->
+                    <DataGridTextColumn Header="Duplicate"
+                                        Binding="{Binding DuplicateStatusDisplay}"
+                                        Width="80"
+                                        IsReadOnly="True" />
 
-                <DataGridTextColumn Header="DupeGrp"
-                                    Binding="{Binding DuplicateGroupId}"
-                                    Width="80"
-                                    IsReadOnly="True" />
+                    <!-- Group size: how many items share this duplicate group -->
+                    <DataGridTextColumn Header="#Dupe"
+                                        Binding="{Binding DuplicateGroupSize}"
+                                        Width="60"
+                                        IsReadOnly="True" />
 
-                <DataGridTextColumn Header="Folder"
-                                    Binding="{Binding FolderName}"
-                                    MinWidth="90"
-                                    Width="*"
-                                    IsReadOnly="True" />
-                
-                <DataGridCheckBoxColumn Header="MFA"
-                                        Binding="{Binding HasTotp, Mode=OneWay}"
-                                        IsReadOnly="True"
-                                        MinWidth="40"
-                                        Width="*" />
+                    <DataGridTextColumn Header="DupeGrp"
+                                        Binding="{Binding DuplicateGroupId}"
+                                        Width="80"
+                                        IsReadOnly="True" />
 
-                <DataGridCheckBoxColumn Header="Passkey"
-                                        Binding="{Binding HasPasskey, Mode=OneWay}"
-                                        IsReadOnly="True"
-                                        MinWidth="40"
-                                        Width="*" />
+                    <DataGridTextColumn Header="Folder"
+                                        Binding="{Binding FolderName}"
+                                        MinWidth="90"
+                                        Width="*"
+                                        IsReadOnly="True" />
 
-            </DataGrid.Columns>
-        </DataGrid>
+                    <DataGridCheckBoxColumn Header="MFA"
+                                            Binding="{Binding HasTotp, Mode=OneWay}"
+                                            IsReadOnly="True"
+                                            MinWidth="40"
+                                            Width="*" />
+
+                    <DataGridCheckBoxColumn Header="Passkey"
+                                            Binding="{Binding HasPasskey, Mode=OneWay}"
+                                            IsReadOnly="True"
+                                            MinWidth="40"
+                                            Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Faded logo watermark when there are no items -->
+            <Image Source="pack://application:,,,/Assets/VaultWinnowLogo.png"
+       Width="200"
+       Height="200"
+       Opacity="0.33"
+       IsHitTestVisible="False"
+       HorizontalAlignment="Center"
+       VerticalAlignment="Center">
+                <Image.Style>
+                    <Style TargetType="Image">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Items.Count}"
+                             Value="0">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Image.Style>
+            </Image>
+
+        </Grid>
 
         <!-- Footer -->
         <TextBlock Grid.Row="4"

@@ -9,12 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added a new `VaultWinnow.Tests` xUnit project with initial unit tests for Strict and Almost duplicate detection on Login items.
+- App and About dialog branding with the new VaultWinnow logo, including a larger logo and stacked version line in the About window.
+- Faded VaultWinnow logo watermark centered in the main DataGrid when no items are loaded, automatically hidden once a vault is opened.
 
 ### Changed
 - Refactored duplicate detection into a dedicated `DuplicateAnalyzer` helper class, independent of the WPF UI.
 - Added a `VaultWinnow.Tests` xUnit project with tests covering Strict, Almost, non-duplicates, and mixed groups for login items.
 - Tightened duplicate rules so TOTP value differences and passkey differences are treated as Almost, never Strict.
 - Added a “Dup Help” toolbar button and Duplicate Analysis Help window explaining Strict / Almost / None behavior.
+- Minor layout tweaks to the About window to improve readability and visual hierarchy.
 
 ### Fixed
 - 

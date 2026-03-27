@@ -29,7 +29,11 @@ namespace VaultWinnow
         private bool _showOnlyDuplicates;
         private bool _hasDuplicateAnalysis;
 
-
+        public ObservableCollection<VaultItem> Items
+        {
+            get => _items;
+            set => _items = value;
+        }
 
         [Flags]
         public enum ItemTypeFilter
@@ -45,6 +49,8 @@ namespace VaultWinnow
         public MainWindow()
         {
             InitializeComponent();
+
+            Items = new ObservableCollection<VaultItem>();
 
             ItemGrid.ItemsSource = _items;
             _itemsView = CollectionViewSource.GetDefaultView(_items);

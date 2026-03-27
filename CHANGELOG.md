@@ -8,9 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- 
+
+### Changed
+- 
+
+### Fixed
+- 
+
+## 0.4.0-beta - 2026-03-27
+
+### Added
 - Added a new `VaultWinnow.Tests` xUnit project with initial unit tests for Strict and Almost duplicate detection on Login items.
 - App and About dialog branding with the new VaultWinnow logo, including a larger logo and stacked version line in the About window.
 - Faded VaultWinnow logo watermark centered in the main DataGrid when no items are loaded, automatically hidden once a vault is opened.
+- Column visibility toggles for duplicate-related and MFA/Passkey columns, so users can hide Dup, Count, Group, MFA, and Passkey when not needed.
+- Collapsible “Options” panel that groups type filters, Show only duplicates, and column visibility controls to reduce vertical clutter while keeping filters close to the grid.
 
 ### Changed
 - Refactored duplicate detection into a dedicated `DuplicateAnalyzer` helper class, independent of the WPF UI.
@@ -18,9 +31,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Tightened duplicate rules so TOTP value differences and passkey differences are treated as Almost, never Strict.
 - Added a “Dup Help” toolbar button and Duplicate Analysis Help window explaining Strict / Almost / None behavior.
 - Minor layout tweaks to the About window to improve readability and visual hierarchy.
+- Toolbar layout with grouped, color-coded icon+label buttons and increased button height for clearer, vertically stacked labels.
+- Main grid column widths (Name, Username, Primary URI, and small diagnostic columns) to start at sensible sizes and remain readable without manual resizing on load.
+- DataGrid configuration to better support horizontal scrolling and manual column resizing when users need more space for long URIs or names.
 
 ### Fixed
-- 
+- Duplicate, Count, Group, MFA, and Passkey column headers no longer appear squashed on initial load; headers and tooltips are fully visible.
 
 ## 0.3.0-beta - 2026-03-22
 

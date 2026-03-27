@@ -177,6 +177,21 @@ namespace VaultWinnow
                 item.HasDuplicateAnalysis = false;
             }
 
+            // auto-size main text columns after data is loaded
+            ItemGrid.UpdateLayout();
+
+            // 0: checkbox, 1: Name, 2: Username, 3: Primary URI
+            int nameIndex = 1;
+            int usernameIndex = 2;
+            int uriIndex = 3;
+
+            if (ItemGrid.Columns.Count > uriIndex)
+            {
+                ItemGrid.Columns[nameIndex].Width = DataGridLength.Auto;
+                ItemGrid.Columns[usernameIndex].Width = DataGridLength.Auto;
+                ItemGrid.Columns[uriIndex].Width = new DataGridLength(2, DataGridLengthUnitType.Star);
+            }
+
         }
 
         private void BtnExport_Click(object sender, RoutedEventArgs e)
@@ -643,6 +658,39 @@ namespace VaultWinnow
             // 6. Unchecked first, then checked
             _itemsView.SortDescriptions.Add(
                 new SortDescription(nameof(VaultItem.IsSelected), ListSortDirection.Ascending));
+        }
+
+        private void ColumnVisibilityChanged(object sender, RoutedEventArgs e)
+        {
+            if (ItemGrid == null)
+                return;
+
+            // Adjust indices if your column order changes
+            // 0: checkbox, 1: Name, 2: Username, 3: Primary URI, 4: Type
+            int dupIndex = 5;
+            int dupCountIndex = 6;
+            int dupGroupIndex = 7;
+            int folderIndex = 8;
+            int mfaIndex = 9;
+            int passkeyIndex = 10;
+
+            if (ItemGrid.Columns.Count > passkeyIndex)
+            {
+                ItemGrid.Columns[dupIndex].Visibility =
+                    ChkColDup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+                ItemGrid.Columns[dupCountIndex].Visibility =
+                    ChkColDupCount.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+                ItemGrid.Columns[dupGroupIndex].Visibility =
+                    ChkColDupGroup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+                ItemGrid.Columns[mfaIndex].Visibility =
+                    ChkColMfa.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+                ItemGrid.Columns[passkeyIndex].Visibility =
+                    ChkColPasskey.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
 

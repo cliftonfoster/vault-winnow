@@ -20,7 +20,8 @@ few items”. VaultWinnow fills that gap:
 ---
 
 ## Features
- Load an unencrypted Bitwarden / Vaultwarden JSON export.
+
+- Load an unencrypted Bitwarden / Vaultwarden JSON export.
 
 View all items in a grid:
 
@@ -44,18 +45,26 @@ Selection helpers (respecting filters):
 - Clear Selection (clears selection only for the visible, filtered items).
 - Invert Selection to flip checkboxes for all visible items.
 
-Duplicate analysis for logins:
+Options panel and column visibility  
+- Collapsible **Options** panel groups type filters (Logins, Secure Notes, Cards, Identities), the “Show only duplicates” toggle, and column visibility toggles.  
+- Column visibility checkboxes let you hide or show duplicate-related columns (Dup, Count, Group) and MFA/Passkey columns so the grid can be as simple or detailed as you need.
 
-- Labels each login as **Strict**, **Almost**, or **None** without changing Bitwarden’s JSON format.
-- **Strict** = same site, name, username, password, notes, TOTP, and passkeys; safe to auto-select duplicates (one kept, the rest can be removed).
-- **Almost** = same site but important details differ (name, password, notes, 2FA/TOTP, or passkeys); always review manually.
-- **None** = everything else, including reused passwords on different sites and non-login items.
-- A “Dup Help” button in the toolbar opens a small window summarizing these rules.
+Duplicate analysis for logins  
+- Labels each login as Strict, Almost, or None without changing Bitwarden’s JSON format.  
+- Strict: same site, name, username, password, notes, TOTP, and passkeys – safe to auto-select duplicates (one kept, the rest can be removed).  
+- Almost: same site but important details differ (name, password, notes, 2FA/TOTP, or passkeys) – always review manually.  
+- None: everything else, including reused passwords on different sites and non-login items.  
+- A “Dup”, “Count”, and “Group” column show status, group size, and a stable group id so related Strict/Almost entries stay adjacent when sorted.  
+- A “Show only duplicates” toggle filters the view to Strict/Almost items, combined with existing search and type filters.
 
-Toolbar icons and shortcuts:
-
-- Compact toolbar with icon+text buttons and descriptive tooltips for Open, Export, Copy, Append, Select, Clear, Invert, Analyze (duplicate analysis), Dup Help, and About.
-- Keyboard shortcuts: Ctrl+O (Open JSON), Ctrl+E (Export Selected), Ctrl+C (Copy JSON), Ctrl+A (Select All visible), Ctrl+L (Clear Selection visible).
+Toolbar icons and shortcuts  
+- Compact toolbar with grouped icon+text buttons and descriptive tooltips for Open, Export, Copy, Append, Select, Clear, Invert, Analyze (duplicate analysis), Dup Help, Select Strict, and About.  
+- Keyboard shortcuts:  
+  - Ctrl+O – Open JSON  
+  - Ctrl+E – Export Selected  
+  - Ctrl+C – Copy JSON to Clipboard  
+  - Ctrl+A – Select All (visible)  
+  - Ctrl+L – Clear Selection (visible)
 
 Export options and safety:
 
@@ -145,13 +154,12 @@ Export options and safety:
 textVaultWinnow/
 ├── Models/
 │   └── VaultModels.cs       # JSON models (VaultExport, VaultItem, login/card/identity/etc.)
-├── MainWindow.xaml          # Main UI: toolbar, search box, type filters, DataGrid
-├── MainWindow.xaml.cs       # Load, filter, select, export, copy, append logic
+├── MainWindow.xaml          # Main UI (toolbar, search box, Options panel, DataGrid) 
+├── MainWindow.xaml.cs       # Load, filter, selection, duplicate analysis wiring, column visibility, export/copy/append logic
 ├── AboutWindow.xaml         # About dialog UI
 ├── AboutWindow.xaml.cs      # About dialog logic (GitHub/Ko‑fi links) 
 ├── DuplicateHelpWindow.xaml     # Duplicate analysis help dialog UI
 ├── DuplicateHelpWindow.xaml.cs  # Help dialog logic
-handling)
 └── VaultWinnow.csproj       # WPF project file
 ```
 
@@ -177,10 +185,10 @@ The JSON model layer is intentionally close to the Bitwarden/Vaultwarden export
 
 Planned or potential future enhancements:
 
-- Column sorting and column visibility toggles.
 - Additional export formats (KeePass, 1Password, etc.).
 - Per-item preview/details pane.
 - Dark mode and other visual themes.
+- Column sorting and optional saved column layouts.
 
 Suggestions and PRs for small, focused features that keep the app simple are welcome.
 

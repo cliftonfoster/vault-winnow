@@ -6,6 +6,8 @@ import-ready JSON file (or clipboard text) containing only those items.
 
 Built with WPF and .NET, intended to be simple, offline, and free/open source.
 
+Download the latest release at https://github.com/cliftonfoster/vault-winnow/releases.
+
 ---
 
 ## Why?

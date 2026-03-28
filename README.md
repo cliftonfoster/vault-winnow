@@ -178,22 +178,18 @@ The JSON model layer is intentionally close to the Bitwarden/Vaultwarden export
   - No network calls are made.
 - Your vault data stays on your machine; still, exported JSON is sensitive and
    should be deleted when no longer needed.
-- Only **unencrypted** export files are supported. Encrypted exports must be
+-  Only **unencrypted** export files are supported. Encrypted exports must be
    decrypted via Bitwarden/Vaultwarden before use.
    
 ------
 
 ## Antivirus & Integrity
 
-- SHA-256 (VaultWinnow-0.3.0-beta.exe): 81c04bb174c9e150507e62ee33a7a95d1aaafd5ec49cecd4f7663c63b1ad58a4
-  
-- VirusTotal: 
-  🛡️ [Scan results for VaultWinnow-0.3.0-beta.exe](https://www.virustotal.com/gui/file/81c04bb174c9e150507e62ee33a7a95d1aaafd5ec49cecd4f7663c63b1ad58a4/detection)
+- SHA-256 (VaultWinnow-0.4.0-beta.exe):  
+  `599529117c5207041db5680be8cf77153c1190e561e3ec7c71df4c4f09de6bed`
 
-- Notes: 
-  One lesser-known engine (Zillya) currently flags this binary as Downloader.MLoki.Win64.10. 
-  All other engines on VirusTotal report it as clean. Based on the open-source code and
-  multi-engine scan, this appears to be a false positive.
+- VirusTotal:  
+  🛡️ [Scan results for VaultWinnow-0.4.0-beta.exe](https://www.virustotal.com/gui/file/599529117c5207041db5680be8cf77153c1190e561e3ec7c71df4c4f09de6bed)
 
 ------
 

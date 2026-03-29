@@ -23,7 +23,7 @@ few items”. VaultWinnow fills that gap:
 
 ## Features
 
-- Load an unencrypted Bitwarden / Vaultwarden JSON export.
+Load an unencrypted Bitwarden / Vaultwarden JSON export.
 
 View all items in a grid:
 
@@ -48,8 +48,7 @@ Selection helpers (respecting filters):
 - Invert Selection to flip checkboxes for all visible items.
 
 Options panel and column visibility  
-- Collapsible **Options** panel groups type filters (Logins, Secure Notes, Cards, Identities), the “Show only duplicates” toggle, and column visibility toggles.  
-- Column visibility checkboxes let you hide or show duplicate-related columns (Dup, Count, Group) and MFA/Passkey columns so the grid can be as simple or detailed as you need.
+- Collapsible Options panel (collapsed by default) groups type filters (Logins, Secure Notes, Cards, Identities), the “Show only duplicates” toggle, and column visibility checkboxes (Dup, Count, Group, MFA, Passkey).
 
 Duplicate analysis for logins  
 - Labels each login as Strict, Almost, or None without changing Bitwarden’s JSON format.  
@@ -60,13 +59,7 @@ Duplicate analysis for logins
 - A “Show only duplicates” toggle filters the view to Strict/Almost items, combined with existing search and type filters.
 
 Toolbar icons and shortcuts  
-- Compact toolbar with grouped icon+text buttons and descriptive tooltips for Open, Export, Copy, Append, Select, Clear, Invert, Analyze (duplicate analysis), Dup Help, Select Strict, and About.  
-- Keyboard shortcuts:  
-  - Ctrl+O – Open JSON  
-  - Ctrl+E – Export Selected  
-  - Ctrl+C – Copy JSON to Clipboard  
-  - Ctrl+A – Select All (visible)  
-  - Ctrl+L – Clear Selection (visible)
+- Compact toolbar with grouped icon+text buttons and descriptive tooltips for Open, Close, Export, Copy, Append, Select, Clear, Invert, Analyze duplicate analysis, Dup Help, Select Strict, and About. (Shortcuts: Ctrl+O, Ctrl+W, Ctrl+E, Ctrl+C, Ctrl+A, Ctrl+L.)
 
 Export options and safety:
 
@@ -153,7 +146,7 @@ Export options and safety:
 ## Project Structure
 
 ```
-textVaultWinnow/
+VaultWinnow/
 ├── Models/
 │   └── VaultModels.cs       # JSON models (VaultExport, VaultItem, login/card/identity/etc.)
 ├── MainWindow.xaml          # Main UI (toolbar, search box, Options panel, DataGrid) 

@@ -11,10 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 
 
 ### Changed
-- 
+- Added a Close toolbar button and Ctrl+W shortcut to close the current file, with a confirmation if items are selected.
+- Disabled Select and Clear toolbar actions until a file is loaded, so the initial toolbar state matches available actions.
+- Centralized “no file loaded” UI reset into a single helper method to keep Open/Close/failure paths consistent.
+- Set the Options panel (type filters, duplicate toggle, column visibility) to start collapsed so the main grid is less visually busy by default.
 
 ### Fixed
-- 
+- Standardized button click handler names (`BtnSomethingClick`) for consistency across the codebase.
+- Clarified tooltips for duplicate-related and MFA/Passkey columns so Strict/Almost/None and group/count semantics are easier to understand.
 
 ## 0.4.0-beta - 2026-03-27
 

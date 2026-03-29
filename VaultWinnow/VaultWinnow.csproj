@@ -22,6 +22,7 @@
 	  <None Remove="Assets\Icons\analyze.png" />
 	  <None Remove="Assets\Icons\check-clear.png" />
 	  <None Remove="Assets\Icons\check-select-all.png" />
+	  <None Remove="Assets\Icons\close.png" />
 	  <None Remove="Assets\Icons\info.png" />
 	  <None Remove="Assets\Icons\invert.png" />
 	  <None Remove="Assets\Icons\json-append.png" />
@@ -54,6 +55,9 @@
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Assets\Icons\check-select-all.png">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="Assets\Icons\close.png">
 	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 	  </Resource>
 	  <Resource Include="Assets\Icons\info.png">

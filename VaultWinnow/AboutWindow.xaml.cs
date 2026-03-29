@@ -39,7 +39,7 @@ namespace VaultWinnow
         }
 
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private void OkButtonClick(object sender, RoutedEventArgs e)
         {
             Close();
         }

@@ -28,6 +28,7 @@ namespace VaultWinnow
         public ICommand ClearSelectionCommand { get; }
         private bool _showOnlyDuplicates;
         private bool _hasDuplicateAnalysis;
+        public ICommand CloseCommand { get; }
 
         public ObservableCollection<VaultItem> Items
         {
@@ -50,7 +51,11 @@ namespace VaultWinnow
         {
             InitializeComponent();
 
+            CloseCommand = new RelayCommand(_ => BtnCloseClick(this, new RoutedEventArgs()),
+                    _ => BtnClose.IsEnabled);
+                    DataContext = this;
             Items = new ObservableCollection<VaultItem>();
+
 
             ItemGrid.ItemsSource = _items;
             _itemsView = CollectionViewSource.GetDefaultView(_items);
@@ -58,31 +63,26 @@ namespace VaultWinnow
                 _itemsView.Filter = ItemsFilter;
 
             // Commands for keyboard shortcuts
-            OpenCommand = new RelayCommand(_ => BtnOpen_Click(this, new RoutedEventArgs()),
+            OpenCommand = new RelayCommand(_ => BtnOpenClick(this, new RoutedEventArgs()),
                                            _ => BtnOpen.IsEnabled);
-            ExportCommand = new RelayCommand(_ => BtnExport_Click(this, new RoutedEventArgs()),
+            ExportCommand = new RelayCommand(_ => BtnExportClick(this, new RoutedEventArgs()),
                                              _ => BtnExport.IsEnabled);
-            CopyCommand = new RelayCommand(_ => BtnCopyToClipboard_Click(this, new RoutedEventArgs()),
+            CopyCommand = new RelayCommand(_ => BtnCopyToClipboardClick(this, new RoutedEventArgs()),
                                            _ => BtnCopyToClipboard.IsEnabled);
-            SelectAllCommand = new RelayCommand(_ => BtnSelectAll_Click(this, new RoutedEventArgs()),
+            SelectAllCommand = new RelayCommand(_ => BtnSelectAllClick(this, new RoutedEventArgs()),
                                                 _ => BtnSelectAll.IsEnabled);
-            ClearSelectionCommand = new RelayCommand(_ => BtnClearSelection_Click(this, new RoutedEventArgs()),
+            ClearSelectionCommand = new RelayCommand(_ => BtnClearSelectionClick(this, new RoutedEventArgs()),
                                                      _ => BtnClearSelection.IsEnabled);
 
             DataContext = this;
 
-            if (TxtStatus != null)
-            {
-                TxtStatus.Text = "No file loaded.";
-                TxtStatus.ToolTip = null;
-                TxtStatus.Foreground = Brushes.Gray;
-            }
+            DataContext = this;
 
-            UpdateCount();
+            ResetUiToNoFileState();
         }
 
 
-        private void BtnOpen_Click(object sender, RoutedEventArgs e)
+        private void BtnOpenClick(object sender, RoutedEventArgs e)
         {
             var dlg = new OpenFileDialog
             {
@@ -99,6 +99,8 @@ namespace VaultWinnow
             {
                 MessageBox.Show("Failed to parse the JSON file.", "Error",
                     MessageBoxButton.OK, MessageBoxImage.Error);
+
+                ResetUiToNoFileState();
                 return;
             }
 
@@ -129,8 +131,10 @@ namespace VaultWinnow
                 TxtStatus.ToolTip = dlg.FileName;
                 TxtStatus.Foreground = Brushes.DarkGreen;
             }
+
             BtnAnalyzeDuplicates.IsEnabled = true;
             BtnSelectStrictDuplicates.IsEnabled = true;
+            BtnClose.IsEnabled = true;
             BtnExport.IsEnabled = true;
             BtnCopyToClipboard.IsEnabled = true;
             BtnAppendToJson.IsEnabled = true;
@@ -194,7 +198,24 @@ namespace VaultWinnow
 
         }
 
-        private void BtnExport_Click(object sender, RoutedEventArgs e)
+private void BtnCloseClick(object sender, RoutedEventArgs e)
+{
+    if (_items != null && _items.Any(i => i.IsSelected))
+    {
+        var result = MessageBox.Show(
+            "You have selected items. Close without exporting?",
+            "Close file",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result != MessageBoxResult.Yes)
+            return;
+    }
+
+    ResetUiToNoFileState();
+}
+
+        private void BtnExportClick(object sender, RoutedEventArgs e)
         {
             var outputJson = BuildFilteredExportJson();
             if (outputJson == null) return;
@@ -246,7 +267,7 @@ namespace VaultWinnow
                 new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
         }
 
-        private void BtnCopyToClipboard_Click(object sender, RoutedEventArgs e)
+        private void BtnCopyToClipboardClick(object sender, RoutedEventArgs e)
         {
             var outputJson = BuildFilteredExportJson();
             if (outputJson == null) return;
@@ -290,7 +311,7 @@ namespace VaultWinnow
             };
         }
 
-        private void BtnAppendToJson_Click(object sender, RoutedEventArgs e)
+        private void BtnAppendToJsonClick(object sender, RoutedEventArgs e)
         {
             var toAppend = BuildFilteredExport();
             if (toAppend == null) return;
@@ -431,7 +452,7 @@ namespace VaultWinnow
 
             UpdateCount();
         }
-        private void BtnSelectAll_Click(object sender, RoutedEventArgs e)
+        private void BtnSelectAllClick(object sender, RoutedEventArgs e)
         {
             if (_itemsView == null)
                 return;
@@ -445,7 +466,7 @@ namespace VaultWinnow
             UpdateCount();
         }
 
-        private void BtnClearSelection_Click(object sender, RoutedEventArgs e)
+        private void BtnClearSelectionClick(object sender, RoutedEventArgs e)
         {
             if (_itemsView == null)
                 return;
@@ -459,7 +480,7 @@ namespace VaultWinnow
             UpdateCount();
         }
 
-        private void BtnAbout_Click(object sender, RoutedEventArgs e)
+        private void BtnAboutClick(object sender, RoutedEventArgs e)
         {
             var about = new AboutWindow
             {
@@ -710,6 +731,38 @@ namespace VaultWinnow
             UpdateCount();
         }
 
+        private void ResetUiToNoFileState()
+        {
+            // Clear data
+            _items.Clear();
+
+            if (_itemsView != null)
+            {
+                _itemsView.Refresh();
+            }
+
+            // Reset filters / search
+            TxtSearch.Text = string.Empty;
+
+            // Status text
+            TxtStatus.Text = "No file loaded.";
+            TxtStatus.ToolTip = null;
+
+            // Disable file-dependent controls
+            BtnExport.IsEnabled = false;
+            BtnCopyToClipboard.IsEnabled = false;
+            BtnAppendToJson.IsEnabled = false;
+            BtnSelectAll.IsEnabled = false;
+            BtnClearSelection.IsEnabled = false;
+            BtnInvertSelection.IsEnabled = false;
+            BtnAnalyzeDuplicates.IsEnabled = false;
+            BtnSelectStrictDuplicates.IsEnabled = false;
+            ChkShowOnlyDuplicates.IsEnabled = false;
+            BtnClose.IsEnabled = false;
+
+            // Reset counts/footer
+            UpdateCount();
+        }
 
     }
 

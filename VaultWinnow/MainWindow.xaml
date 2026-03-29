@@ -11,6 +11,9 @@
                     Key="O"
                     Command="{Binding OpenCommand}" />
 
+        <!-- Ctrl+W Close file -->
+        <KeyBinding Modifiers="Control" Key="W" Command="{Binding CloseCommand}" />
+
         <!-- Ctrl+E: Export Selected -->
         <KeyBinding Modifiers="Control"
                     Key="E"
@@ -96,7 +99,16 @@
                     ToolTip="Open JSON File (CTRL+O)"
                     MinWidth="48"
                     Height="52"
-                    Click="BtnOpen_Click" />
+                    Click="BtnOpenClick" />
+
+            <Button x:Name="BtnClose"
+                    Style="{StaticResource ToolbarIconButtonStyle}"
+                    Tag="Assets/Icons/close.png"
+                    Content="Close"
+                    ToolTip="Close current file"
+                    Height="52"
+                    IsEnabled="False"
+                    Click="BtnCloseClick" />
 
             <Button Name="BtnExport"
                     Style="{StaticResource ToolbarIconButtonStyle}"
@@ -106,7 +118,7 @@
                     MinWidth="48"
                     Height="52"
                     IsEnabled="False"
-                    Click="BtnExport_Click" />
+                    Click="BtnExportClick" />
 
             <Button Name="BtnCopyToClipboard"
                     Style="{StaticResource ToolbarIconButtonStyle}"
@@ -116,7 +128,7 @@
                     MinWidth="48"
                     Height="52"
                     IsEnabled="False"
-                    Click="BtnCopyToClipboard_Click" />
+                    Click="BtnCopyToClipboardClick" />
 
             <Button Name="BtnAppendToJson"
                     Style="{StaticResource ToolbarIconButtonStyle}"
@@ -126,7 +138,7 @@
                     MinWidth="48"
                     Height="52"
                     IsEnabled="False"
-                    Click="BtnAppendToJson_Click" />
+                    Click="BtnAppendToJsonClick" />
 
             <Separator Margin="8,0,8,0" />
 
@@ -138,7 +150,8 @@
                     ToolTip="Select All Listed Items (CTRL+A)"
                     MinWidth="48"
                     Height="52"
-                    Click="BtnSelectAll_Click" />
+                    IsEnabled="False"
+                    Click="BtnSelectAllClick" />
 
             <Button Name="BtnClearSelection"
                     Style="{StaticResource ToolbarIconButtonStyle}"
@@ -147,7 +160,8 @@
                     ToolTip="Clear All Listed Items (CTRL+L)"
                     MinWidth="48"
                     Height="52"
-                    Click="BtnClearSelection_Click" />
+                    IsEnabled="False"
+                    Click="BtnClearSelectionClick" />
 
             <Button Name="BtnInvertSelection"
                     Style="{StaticResource ToolbarIconButtonStyle}"
@@ -201,7 +215,7 @@
                     ToolTip="About VaultWinnow"
                     MinWidth="48"
                     Height="52"
-                    Click="BtnAbout_Click" />
+                    Click="BtnAboutClick" />
         </StackPanel>
 
         <!-- Status Row -->
@@ -225,7 +239,7 @@
         <!-- Filters and column options (collapsible) -->
         <Expander Grid.Row="2"
                   Header="Options"
-                  IsExpanded="True"
+                  IsExpanded="False"
                   Margin="0,0,0,4">
             <StackPanel Orientation="Vertical">
 
@@ -372,41 +386,71 @@
                                             MinWidth="70"
                                             IsReadOnly="True" />
 
-                        <DataGridTextColumn Header="Dup"
-                                            Binding="{Binding DuplicateStatusDisplay}"
-                                            Width="70"
-                                            MinWidth="70"
-                                            IsReadOnly="True" />
+                    <DataGridTextColumn Header="Dup"
+                                        Binding="{Binding DuplicateStatusDisplay}"
+                                        Width="80"
+                                        IsReadOnly="True">
+                                            <DataGridTextColumn.HeaderStyle>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="ToolTip"
+                                        Value="Duplicate status for logins: Strict (safe auto‑select), Almost (needs review), or blank (no duplicates)." />
+                                                </Style>
+                                            </DataGridTextColumn.HeaderStyle>
+                    </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="Ct"
-                                            Binding="{Binding DuplicateGroupSize}"
-                                            Width="40"
-                                            MinWidth="40"
-                                            IsReadOnly="True" />
+                    <DataGridTextColumn Header="#Dup"
+                                        Binding="{Binding DuplicateGroupSize}"
+                                        Width="60"
+                                        IsReadOnly="True">
+                                            <DataGridTextColumn.HeaderStyle>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="ToolTip"
+                                        Value="How many items are in this duplicate group. 1 means no duplicates; 2+ means multiple related logins." />
+                                                </Style>
+                                            </DataGridTextColumn.HeaderStyle>
+                    </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="Grp"
-                                            Binding="{Binding DuplicateGroupId}"
-                                            Width="40"
-                                            MinWidth="40"
-                                            IsReadOnly="True" />
+                    <DataGridTextColumn Header="Grp"
+                                        Binding="{Binding DuplicateGroupId}"
+                                        Width="80"
+                                        IsReadOnly="True">
+                                            <DataGridTextColumn.HeaderStyle>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="ToolTip"
+                                        Value="Stable duplicate group id so related Strict/Almost logins stay together when sorted." />
+                                                </Style>
+                                            </DataGridTextColumn.HeaderStyle>
+                    </DataGridTextColumn>
 
-                        <DataGridTextColumn Header="Folder"
+                    <DataGridTextColumn Header="Folder"
                                             Binding="{Binding FolderName}"
                                             Width="80"
                                             MinWidth="50"
                                             IsReadOnly="True" />
 
-                        <DataGridCheckBoxColumn Header="MFA"
-                                                Binding="{Binding HasTotp, Mode=OneWay}"
-                                                Width="55"
-                                                MinWidth="55"
-                                                IsReadOnly="True" />
+                    <DataGridCheckBoxColumn Header="MFA"
+                                            Binding="{Binding HasTotp, Mode=OneWay}"
+                                            Width="50"
+                                            IsReadOnly="True">
+                                            <DataGridCheckBoxColumn.HeaderStyle>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="ToolTip"
+                                            Value="Checked if this login has a TOTP MFA code configured." />
+                                                </Style>
+                                            </DataGridCheckBoxColumn.HeaderStyle>
+                    </DataGridCheckBoxColumn>
 
-                        <DataGridCheckBoxColumn Header="Passkey"
-                                                Binding="{Binding HasPasskey, Mode=OneWay}"
-                                                Width="50"
-                                                MinWidth="50"
-                                                IsReadOnly="True" />
+                    <DataGridCheckBoxColumn Header="Passkey"
+                                            Binding="{Binding HasPasskey, Mode=OneWay}"
+                                            Width="70"
+                                            IsReadOnly="True">
+                                            <DataGridCheckBoxColumn.HeaderStyle>
+                                                <Style TargetType="DataGridColumnHeader">
+                                                    <Setter Property="ToolTip"
+                                            Value="Checked if this login has any passkey (FIDO2) credentials." />
+                                                </Style>
+                                            </DataGridCheckBoxColumn.HeaderStyle>
+                    </DataGridCheckBoxColumn>
 
                 </DataGrid.Columns>
             </DataGrid>

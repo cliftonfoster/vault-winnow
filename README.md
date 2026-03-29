@@ -59,7 +59,7 @@ Duplicate analysis for logins
 - A “Show only duplicates” toggle filters the view to Strict/Almost items, combined with existing search and type filters.
 
 Toolbar icons and shortcuts  
-- Compact toolbar with grouped icon+text buttons and descriptive tooltips for Open, Close, Export, Copy, Append, Select, Clear, Invert, Analyze duplicate analysis, Dup Help, Select Strict, and About. (Shortcuts: Ctrl+O, Ctrl+W, Ctrl+E, Ctrl+C, Ctrl+A, Ctrl+L.)
+- Compact toolbar with grouped icon+text buttons and descriptive tooltips for Open, Close, Export, Copy, Append, Select, Clear, Invert, Analyze (duplicate analysis), Dup Help, Select Strict, and About. (Shortcuts: Ctrl+O, Ctrl+W, Ctrl+E, Ctrl+C, Ctrl+A, Ctrl+L.)
 
 Export options and safety:
 

@@ -308,7 +308,7 @@
                               Unchecked="ColumnVisibilityChanged" />
 
                     <CheckBox x:Name="ChkColDupGroup"
-                              Content="DupeGrp"
+                              Content="Grp"
                               IsChecked="True"
                               Margin="0,0,6,0"
                               Checked="ColumnVisibilityChanged"

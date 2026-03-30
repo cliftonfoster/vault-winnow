@@ -29,6 +29,7 @@ namespace VaultWinnow
         private bool _showOnlyDuplicates;
         private bool _hasDuplicateAnalysis;
         public ICommand CloseCommand { get; }
+        private bool _hasShownAnalyzeCompletedMessage;
 
         public ObservableCollection<VaultItem> Items
         {
@@ -198,22 +199,22 @@ namespace VaultWinnow
 
         }
 
-private void BtnCloseClick(object sender, RoutedEventArgs e)
-{
-    if (_items != null && _items.Any(i => i.IsSelected))
-    {
-        var result = MessageBox.Show(
-            "You have selected items. Close without exporting?",
-            "Close file",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Question);
+        private void BtnCloseClick(object sender, RoutedEventArgs e)
+        {
+            if (_items != null && _items.Any(i => i.IsSelected))
+            {
+                var result = MessageBox.Show(
+                    "You have selected items. Close without exporting?",
+                    "Close file",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
 
-        if (result != MessageBoxResult.Yes)
-            return;
-    }
+                if (result != MessageBoxResult.Yes)
+                    return;
+            }
 
-    ResetUiToNoFileState();
-}
+            ResetUiToNoFileState();
+        }
 
         private void BtnExportClick(object sender, RoutedEventArgs e)
         {
@@ -241,17 +242,31 @@ private void BtnCloseClick(object sender, RoutedEventArgs e)
             int total = _items?.Count ?? 0;
 
             int visible = total;
+            int selectedVisible = 0;
+
             if (_itemsView != null)
             {
-                visible = _itemsView.Cast<object>().Count();
+                var visibleItems = _itemsView.Cast<object>().OfType<VaultItem>().ToList();
+                visible = visibleItems.Count;
+                selectedVisible = visibleItems.Count(i => i.IsSelected);
             }
 
-            int selected = _items?.Count(i => i.IsSelected) ?? 0;
+            int selectedTotal = _items?.Count(i => i.IsSelected) ?? 0;
+            int selectedHidden = selectedTotal - selectedVisible;
 
             if (TxtCount == null)
-                return; // XAML not initialized yet or window is closing
+                return;
 
-            TxtCount.Text = $"{selected} selected  {visible} visible of {total} total";
+            string selectedDetail = string.Empty;
+
+            // Only show the detail when there are hidden selected items
+            if (selectedHidden > 0)
+            {
+                selectedDetail = $" ({selectedVisible} visible, {selectedHidden} hidden)";
+            }
+
+            TxtCount.Text =
+                $"{selectedTotal} selected{selectedDetail}  {visible} visible of {total} total";
         }
 
 
@@ -454,29 +469,19 @@ private void BtnCloseClick(object sender, RoutedEventArgs e)
         }
         private void BtnSelectAllClick(object sender, RoutedEventArgs e)
         {
-            if (_itemsView == null)
-                return;
-
-            foreach (var obj in _itemsView)
-            {
-                if (obj is VaultItem item)
-                    item.IsSelected = true;
-            }
-
+            SelectionHelper.SelectAll(_itemsView);
             UpdateCount();
         }
 
         private void BtnClearSelectionClick(object sender, RoutedEventArgs e)
         {
-            if (_itemsView == null)
-                return;
+            SelectionHelper.ClearSelection(_itemsView);
+            UpdateCount();
+        }
 
-            foreach (var obj in _itemsView)
-            {
-                if (obj is VaultItem item)
-                    item.IsSelected = false;
-            }
-
+        private void BtnInvertSelectionClick(object sender, RoutedEventArgs e)
+        {
+            SelectionHelper.InvertSelection(_itemsView);
             UpdateCount();
         }
 
@@ -553,11 +558,16 @@ private void BtnCloseClick(object sender, RoutedEventArgs e)
             BtnSelectStrictDuplicates.IsEnabled = true;
             ChkShowOnlyDuplicates.IsEnabled = true;
 
-            MessageBox.Show(
-                "Duplicate analysis complete.\n\nUse the Duplicate and group columns, plus filters, to review results.",
-                "Analyze duplicates",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+if (!_hasShownAnalyzeCompletedMessage)
+{
+    MessageBox.Show(
+        "Duplicate analysis complete.\n\nUse the Duplicate and group columns, plus filters, to review results.",
+        "Analyze duplicates",
+        MessageBoxButton.OK,
+        MessageBoxImage.Information);
+
+    _hasShownAnalyzeCompletedMessage = true;
+}
         }
 
         private void BtnDuplicateHelpClick(object sender, RoutedEventArgs e)
@@ -572,59 +582,10 @@ private void BtnCloseClick(object sender, RoutedEventArgs e)
 
         private void BtnSelectStrictDuplicatesClick(object sender, RoutedEventArgs e)
         {
-            if (!_hasDuplicateAnalysis) return;
-
-
-            if (_itemsView == null)
+            if (!_hasDuplicateAnalysis)
                 return;
 
-            // Group visible strict duplicates by the same strict key used in analysis
-            string GetHost(string? uri)
-            {
-                if (string.IsNullOrWhiteSpace(uri))
-                    return string.Empty;
-
-                if (!Uri.TryCreate(uri, UriKind.Absolute, out var u))
-                    return uri.Trim();
-
-                return u.Host.ToLowerInvariant();
-            }
-
-            var visibleStrict = _itemsView
-                .Cast<object>()
-                .OfType<VaultItem>()
-                .Where(i =>
-                    i.DuplicateStatus == DuplicateStatus.Strict &&
-                    i.TypeLabel == "Login" &&
-                    i.Login != null)
-                .GroupBy(i => new
-                {
-                    Host = GetHost(i.PrimaryUri),
-                    Name = i.Name ?? string.Empty,  // NEW: include Name
-                    Username = i.Username?.Trim().ToLowerInvariant() ?? string.Empty,
-                    Password = i.Login?.Password ?? string.Empty,
-                    Notes = i.Notes ?? string.Empty,
-                    HasTotp = !string.IsNullOrWhiteSpace(i.Login?.Totp),
-                    HasPasskey = i.HasPasskey
-                });
-
-
-            foreach (var group in visibleStrict)
-            {
-                // Choose one to keep unselected; here: the first in the group
-                var itemsInGroup = group.ToList();
-                if (itemsInGroup.Count <= 1)
-                    continue;
-
-                // Clear selection for all first
-                foreach (var item in itemsInGroup)
-                    item.IsSelected = false;
-
-                // Keep the first unselected, select the rest as "safe duplicates"
-                for (int i = 1; i < itemsInGroup.Count; i++)
-                    itemsInGroup[i].IsSelected = true;
-            }
-
+            SelectionHelper.SelectStrictDuplicatesInView(_itemsView);
             UpdateCount();
         }
 
@@ -712,23 +673,6 @@ private void BtnCloseClick(object sender, RoutedEventArgs e)
                 ItemGrid.Columns[passkeyIndex].Visibility =
                     ChkColPasskey.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
             }
-        }
-
-
-        private void BtnInvertSelectionClick(object sender, RoutedEventArgs e)
-        {
-            if (_itemsView == null)
-                return;
-
-            foreach (var obj in _itemsView)
-            {
-                if (obj is VaultItem item)
-                {
-                    item.IsSelected = !item.IsSelected;
-                }
-            }
-
-            UpdateCount();
         }
 
         private void ResetUiToNoFileState()

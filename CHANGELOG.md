@@ -8,17 +8,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
-- 
+- xUnit coverage for selection helpers (Select All, Clear Selection, Invert Selection) to ensure they operate only on the currently visible, filtered items.
+- Extracted grid filtering logic into an ItemsFilterHelper so search text, type filters, and duplicate visibility are handled in one place.
 
 ### Changed
 - Added a Close toolbar button and Ctrl+W shortcut to close the current file, with a confirmation if items are selected.
 - Disabled Select and Clear toolbar actions until a file is loaded, so the initial toolbar state matches available actions.
 - Centralized “no file loaded” UI reset into a single helper method to keep Open/Close/failure paths consistent.
 - Set the Options panel (type filters, duplicate toggle, column visibility) to start collapsed so the main grid is less visually busy by default.
+- Extracted selection-related logic into a dedicated SelectionHelper to keep MainWindow.xaml.cs smaller and easier to maintain, while preserving the existing runtime behavior for Select Strict.
+- Updated the type filter to correctly treat Logins, Secure Notes, Cards, and Identities as combinable flags, so checking multiple types only shows those selected item types.
 
 ### Fixed
 - Standardized button click handler names (`BtnSomethingClick`) for consistency across the codebase.
 - Clarified tooltips for duplicate-related and MFA/Passkey columns so Strict/Almost/None and group/count semantics are easier to understand.
+- Fixed an issue where selecting multiple type filters (for example, Cards and Identities together) would incorrectly show all items instead of only the chosen types.
 
 ## 0.4.0-beta - 2026-03-27
 

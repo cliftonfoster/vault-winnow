@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -421,44 +422,15 @@ namespace VaultWinnow
         private bool ItemsFilter(object obj)
         {
             if (obj is not VaultItem item)
-                return false;
-
-            // Text search (your existing logic)
-            var text = TxtSearch?.Text;
-            if (!string.IsNullOrWhiteSpace(text))
             {
-                text = text.Trim();
-
-                var matchesText =
-                    (item.Name?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
-                    || (item.Username?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
-                    || (item.PrimaryUri?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false)
-                    || (item.FolderName?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false);
-
-                if (!matchesText)
-                    return false;
+                return false;
             }
 
-            // Type filter (new logic)
-            // If you haven't added the enum/field yet, see below.
-            string type = item.TypeLabel;
-
-            if (type == "Login" && !_typeFilter.HasFlag(ItemTypeFilter.Login))
-                return false;
-
-            if (type == "Secure Note" && !_typeFilter.HasFlag(ItemTypeFilter.SecureNote))
-                return false;
-
-            if (type == "Card" && !_typeFilter.HasFlag(ItemTypeFilter.Card))
-                return false;
-
-            if (type == "Identity" && !_typeFilter.HasFlag(ItemTypeFilter.Identity))
-                return false;
-
-            if (_showOnlyDuplicates && item.DuplicateStatus == DuplicateStatus.None)
-                return false;
-
-            return true;
+            return ItemsFilterHelper.MatchesFilter(
+                item,
+                TxtSearch?.Text,
+                _typeFilter,
+                ChkShowOnlyDuplicates?.IsChecked == true);
         }
 
         private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)

@@ -340,7 +340,30 @@
                       IsReadOnly="False"
                       SelectionMode="Single"
                       GridLinesVisibility="Horizontal"
-                      AlternatingRowBackground="#F5F5F5">
+                      SelectionChanged="ItemGrid_SelectionChanged">
+                <DataGrid.RowStyle>
+                    <Style TargetType="DataGridRow">
+                        <Setter Property="Background" Value="White" />
+                        <Setter Property="Foreground" Value="Black" />
+                        <Setter Property="FontWeight" Value="Normal" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="2" />
+
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}"
+                         Value="True">
+                                <Setter Property="Background" Value="#FFD6EBFF" />
+                            </DataTrigger>
+
+                            <Trigger Property="IsSelected"
+                     Value="True">
+                                <Setter Property="Background" Value="#FF7FB8F0" />
+                                <Setter Property="Foreground" Value="Black" />
+                                <Setter Property="BorderBrush" Value="#FF2F6FAE" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.RowStyle>
 
                 <DataGrid.Columns>
 
@@ -420,6 +443,46 @@
                                         Value="Stable duplicate group id so related Strict/Almost logins stay together when sorted." />
                                                 </Style>
                                             </DataGridTextColumn.HeaderStyle>
+                    </DataGridTextColumn>
+
+                    <DataGridTextColumn Header="Diff"
+                    Binding="{Binding DiffDisplay}"
+                    Width="90"
+                    IsReadOnly="True">
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip">
+                                    <Setter.Value>
+                                        <ToolTip MaxWidth="260">
+                                            <TextBlock TextWrapping="Wrap">
+                                                <Run Text="Difference code order:" FontWeight="Bold" />
+                                                <LineBreak />
+                                                <Run Text="N = Name" />
+                                                <LineBreak />
+                                                <Run Text="U = Username" />
+                                                <LineBreak />
+                                                <Run Text="P = Password" />
+                                                <LineBreak />
+                                                <Run Text="O = Notes" />
+                                                <LineBreak />
+                                                <Run Text="T = TOTP" />
+                                                <LineBreak />
+                                                <Run Text="K = Passkey" />
+                                                <LineBreak />
+                                                <Run Text="Dash (-) means no difference from the selected row." />
+                                            </TextBlock>
+                                        </ToolTip>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="FontFamily" Value="Consolas" />
+                                <Setter Property="TextAlignment" Value="Left" />
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Header="Folder"

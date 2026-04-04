@@ -27,6 +27,7 @@ namespace VaultWinnow // use the same namespace as VaultItem
                 item.DuplicateGroupSize = 0;
                 item.DuplicateGroupId = 0;   // or whatever your default is
                 item.HasDuplicateAnalysis = false;
+                item.DuplicateDiffCodes = null;
             }
 
 
@@ -163,6 +164,9 @@ namespace VaultWinnow // use the same namespace as VaultItem
                         if (!isAlmost)
                             continue;
 
+                        // Compute diff codes once for this pair
+                        var diffCodes = GetDiffCodes(a, b);
+
                         // Shared key for group ID (same as above: host + username + password)
                         var hostKey = GetHost(a.PrimaryUri);
                         var userKey = userA; // already normalized
@@ -170,6 +174,26 @@ namespace VaultWinnow // use the same namespace as VaultItem
 
                         string groupKey = $"{hostKey}|{userKey}|{passKey}";
                         int groupId = GetGroupId(groupKey);
+
+                        void MergeDiffCodes(VaultItem item, string codes)
+                        {
+                            if (string.IsNullOrWhiteSpace(codes))
+                                return;
+
+                            if (string.IsNullOrWhiteSpace(item.DuplicateDiffCodes))
+                            {
+                                item.DuplicateDiffCodes = codes;
+                                return;
+                            }
+
+                            var merged = item.DuplicateDiffCodes
+                                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                .Concat(codes.Split(',', StringSplitOptions.RemoveEmptyEntries))
+                                .Distinct()
+                                .ToArray();
+
+                            item.DuplicateDiffCodes = string.Join(",", merged);
+                        }
 
                         void MarkAlmost(VaultItem item)
                         {
@@ -181,6 +205,8 @@ namespace VaultWinnow // use the same namespace as VaultItem
 
                             if (item.DuplicateGroupId == 0)
                                 item.DuplicateGroupId = groupId;
+
+                            MergeDiffCodes(item, diffCodes);
                         }
 
                         MarkAlmost(a);
@@ -195,6 +221,78 @@ namespace VaultWinnow // use the same namespace as VaultItem
                 item.HasDuplicateAnalysis = true;
             }
 
+        }
+
+        private static string GetDiffCodes(VaultItem a, VaultItem b)
+        {
+            if (a == null || b == null)
+                return string.Empty;
+
+            var codes = new List<string>();
+
+            if (!string.Equals(a.Name ?? string.Empty, b.Name ?? string.Empty, StringComparison.Ordinal))
+                codes.Add("N"); // Name
+
+            if (!string.Equals(a.Username?.Trim() ?? string.Empty, b.Username?.Trim() ?? string.Empty, StringComparison.OrdinalIgnoreCase))
+                codes.Add("U"); // Username
+
+            if (!string.Equals(a.Login?.Password ?? string.Empty, b.Login?.Password ?? string.Empty, StringComparison.Ordinal))
+                codes.Add("P"); // Password
+
+            if (!string.Equals(a.Notes ?? string.Empty, b.Notes ?? string.Empty, StringComparison.Ordinal))
+                codes.Add("O"); // Notes
+
+            bool aHasTotp = !string.IsNullOrWhiteSpace(a.Login?.Totp);
+            bool bHasTotp = !string.IsNullOrWhiteSpace(b.Login?.Totp);
+            string aTotp = a.Login?.Totp?.Trim() ?? string.Empty;
+            string bTotp = b.Login?.Totp?.Trim() ?? string.Empty;
+
+            if (aHasTotp != bHasTotp || !string.Equals(aTotp, bTotp, StringComparison.Ordinal))
+                codes.Add("T"); // TOTP
+
+            if (a.HasPasskey != b.HasPasskey)
+                codes.Add("K"); // Passkey / FIDO2
+
+            return string.Join(",", codes);
+        }
+
+        public static string GetDiffCodeDescription(string? codes)
+        {
+            if (string.IsNullOrWhiteSpace(codes))
+                return string.Empty;
+
+            var parts = codes
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(c => c.Trim().ToUpperInvariant());
+
+            var descriptions = new List<string>();
+
+            foreach (var code in parts)
+            {
+                switch (code)
+                {
+                    case "N":
+                        descriptions.Add("Name");
+                        break;
+                    case "U":
+                        descriptions.Add("Username");
+                        break;
+                    case "P":
+                        descriptions.Add("Password");
+                        break;
+                    case "O":
+                        descriptions.Add("Notes");
+                        break;
+                    case "T":
+                        descriptions.Add("TOTP");
+                        break;
+                    case "K":
+                        descriptions.Add("Passkey");
+                        break;
+                }
+            }
+
+            return string.Join(", ", descriptions.Distinct());
         }
     }
 }

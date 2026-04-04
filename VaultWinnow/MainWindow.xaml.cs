@@ -31,6 +31,8 @@ namespace VaultWinnow
         private bool _hasDuplicateAnalysis;
         public ICommand CloseCommand { get; }
         private bool _hasShownAnalyzeCompletedMessage;
+        private VaultItem? _selectedComparisonItem;
+        private int _selectedDuplicateGroupId;
 
         public ObservableCollection<VaultItem> Items
         {
@@ -439,6 +441,33 @@ namespace VaultWinnow
 
             UpdateCount();
         }
+
+        private void ItemGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            _selectedComparisonItem = ItemGrid.SelectedItem as VaultItem;
+            _selectedDuplicateGroupId = _selectedComparisonItem?.DuplicateGroupId ?? 0;
+
+            foreach (var item in _items.OfType<VaultItem>())
+            {
+                item.IsInSelectedDuplicateGroup =
+                    _selectedDuplicateGroupId > 0 &&
+                    item.DuplicateGroupId == _selectedDuplicateGroupId;
+
+                item.SelectedDiffCodes = string.Empty;
+            }
+
+            if (_selectedComparisonItem is not null && _selectedDuplicateGroupId > 0)
+            {
+                foreach (var item in _items.OfType<VaultItem>()
+                                          .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId))
+                {
+                    item.SelectedDiffCodes = GetDiffCodes(_selectedComparisonItem, item);
+                }
+            }
+
+            _itemsView?.Refresh();
+        }
+
         private void BtnSelectAllClick(object sender, RoutedEventArgs e)
         {
             SelectionHelper.SelectAll(_itemsView);
@@ -612,6 +641,47 @@ if (!_hasShownAnalyzeCompletedMessage)
             // 6. Unchecked first, then checked
             _itemsView.SortDescriptions.Add(
                 new SortDescription(nameof(VaultItem.IsSelected), ListSortDirection.Ascending));
+        }
+
+        private static string GetDiffCodes(VaultItem? baseline, VaultItem? other)
+        {
+            if (baseline is null || other is null)
+                return string.Empty;
+
+            if (ReferenceEquals(baseline, other))
+                return "------";
+
+            static string Norm(string? value) => value?.Trim() ?? string.Empty;
+            static string NormLower(string? value) => value?.Trim().ToLowerInvariant() ?? string.Empty;
+            static bool HasTotp(VaultItem item) => !string.IsNullOrWhiteSpace(item.Login?.Totp);
+            static bool HasPasskey(VaultItem item) => item.HasPasskey;
+
+            var baselineName = Norm(baseline.Name);
+            var otherName = Norm(other.Name);
+
+            var baselineUser = NormLower(baseline.Username);
+            var otherUser = NormLower(other.Username);
+
+            var baselinePassword = baseline.Login?.Password ?? string.Empty;
+            var otherPassword = other.Login?.Password ?? string.Empty;
+
+            var baselineNotes = Norm(baseline.Notes);
+            var otherNotes = Norm(other.Notes);
+
+            var baselineTotp = HasTotp(baseline);
+            var otherTotp = HasTotp(other);
+
+            var baselinePasskey = HasPasskey(baseline);
+            var otherPasskey = HasPasskey(other);
+
+            char n = string.Equals(baselineName, otherName, StringComparison.Ordinal) ? '-' : 'N';
+            char u = string.Equals(baselineUser, otherUser, StringComparison.Ordinal) ? '-' : 'U';
+            char p = string.Equals(baselinePassword, otherPassword, StringComparison.Ordinal) ? '-' : 'P';
+            char o = string.Equals(baselineNotes, otherNotes, StringComparison.Ordinal) ? '-' : 'O';
+            char t = baselineTotp == otherTotp ? '-' : 'T';
+            char k = baselinePasskey == otherPasskey ? '-' : 'K';
+
+            return $"{n}{u}{p}{o}{t}{k}";
         }
 
         private void ColumnVisibilityChanged(object sender, RoutedEventArgs e)

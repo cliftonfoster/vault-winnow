@@ -100,6 +100,20 @@ namespace VaultWinnow.Models
         [JsonIgnore]
         public int DuplicateGroupSize { get; set; } = 0;
 
+        [JsonIgnore]
+        public string? DuplicateDiffCodes { get; set; }
+
+        [JsonIgnore]
+        public string DuplicateDiffDescription => DuplicateAnalyzer.GetDiffCodeDescription(DuplicateDiffCodes);
+
+        [JsonIgnore]
+        public bool IsInSelectedDuplicateGroup { get; set; }
+
+        [JsonIgnore]
+        public string SelectedDiffCodes { get; set; } = string.Empty;
+
+        [JsonIgnore]
+        public string DiffDisplay => SelectedDiffCodes;
 
         [JsonIgnore]
         private bool _isSelected;

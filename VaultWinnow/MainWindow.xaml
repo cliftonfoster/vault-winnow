@@ -79,11 +79,18 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-<RowDefinition Height="Auto"/>  <!-- 0 Toolbar -->
-<RowDefinition Height="Auto"/>  <!-- 1 Search -->
-<RowDefinition Height="Auto" /> <!-- 2 Options (Expander) -->
-<RowDefinition Height="*"/>     <!-- 3 DataGrid -->
-<RowDefinition Height="Auto"/>  <!-- 4 Footer -->
+            <RowDefinition Height="Auto"/>
+            <!-- 0 Toolbar -->
+            <RowDefinition Height="Auto"/>
+            <!-- 1 Search -->
+            <RowDefinition Height="Auto"/>
+            <!-- 2 Options (Expander) -->
+            <RowDefinition Height="*"/>
+            <!-- 3 DataGrid -->
+            <RowDefinition Height="Auto"/>
+            <!-- 4 Details pane -->
+            <RowDefinition Height="Auto"/>
+            <!-- 5 Footer -->
         </Grid.RowDefinitions>
 
         <!-- Toolbar Row -->
@@ -551,8 +558,103 @@ IsReadOnly="True">
 
         </Grid>
 
+        <!-- Selected item details pane -->
+        <Border Grid.Row="4"
+        Margin="0,6,0,0"
+        Padding="8"
+        BorderBrush="#FFB7B7C9"
+        BorderThickness="1"
+        Background="#FFF7F7FB">
+
+            <Grid>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Visible" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding SelectedItem, ElementName=ItemGrid}" Value="{x:Null}">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                   Text="Selected Item Details"
+                   FontWeight="SemiBold"
+                   Foreground="DarkSlateBlue"
+                   Margin="0,0,0,6"/>
+
+                <Grid Grid.Row="1"
+              DataContext="{Binding SelectedItem, ElementName=ItemGrid}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="90"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" FontWeight="SemiBold" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Margin="0,0,12,4"/>
+
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Username:" FontWeight="SemiBold" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Username}" Margin="0,0,0,4"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Primary URI:" FontWeight="SemiBold" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding PrimaryUri}" TextWrapping="Wrap" Margin="0,0,0,4"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Dup status:" FontWeight="SemiBold" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DuplicateStatusDisplay}" Margin="0,0,12,4"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="2" Text="Group:" FontWeight="SemiBold" Margin="0,0,6,4"/>
+                    <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding DuplicateGroupId}" Margin="0,0,0,4"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="#Dup:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DuplicateGroupSize}" Margin="0,0,12,0"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="2" Text="Diff:" FontWeight="SemiBold" Margin="0,0,6,0"/>
+                    <TextBlock Grid.Row="3"
+                       Grid.Column="3"
+                       Text="{Binding DiffDisplay}"
+                       FontFamily="Consolas"
+                       FontWeight="SemiBold"/>
+
+                    <TextBlock Grid.Row="4"
+                       Grid.Column="0"
+                       Grid.ColumnSpan="4"
+                       Margin="0,4,0,0"
+                       Foreground="DimGray"
+                       FontStyle="Italic"
+                       Text="Selected row is the baseline for Diff codes."/>
+
+                </Grid>
+
+                
+                
+                <TextBlock Grid.Row="2"
+                   Margin="0,8,0,0"
+                   Foreground="DimGray"
+                   Text="This pane will expand to show more Almost-duplicate comparison detail."
+                   FontStyle="Italic"/>
+                
+
+            </Grid>
+        </Border>
+
         <!-- Footer -->
-        <TextBlock Grid.Row="4"
+        <TextBlock Grid.Row="5"
                    Name="TxtCount"
                    Text=""
                    Margin="0,6,0,0"

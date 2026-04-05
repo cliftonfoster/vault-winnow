@@ -1,6 +1,5 @@
 ﻿// Models/VaultModels.cs
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.ComponentModel;
 // Only Newtonsoft is used for JSON; this alias keeps your existing JsonIgnore usage.
 using JsonIgnoreAttribute = Newtonsoft.Json.JsonIgnoreAttribute;
@@ -110,7 +109,26 @@ namespace VaultWinnow.Models
         public bool IsInSelectedDuplicateGroup { get; set; }
 
         [JsonIgnore]
-        public string SelectedDiffCodes { get; set; } = string.Empty;
+        private string _selectedDiffCodes = string.Empty;
+
+        [JsonIgnore]
+        public string SelectedDiffCodes
+        {
+            get => _selectedDiffCodes;
+            set
+            {
+                if (_selectedDiffCodes == value)
+                    return;
+
+                _selectedDiffCodes = value;
+                OnPropertyChanged(nameof(SelectedDiffCodes));
+                OnPropertyChanged(nameof(DiffDisplay));
+                OnPropertyChanged(nameof(DiffDisplayDescription));
+            }
+        }
+
+        [JsonIgnore]
+        public string DiffDisplayDescription => DiffDisplayHelper.GetDescription(DiffDisplay);
 
         [JsonIgnore]
         public string DiffDisplay => SelectedDiffCodes;
@@ -329,7 +347,7 @@ namespace VaultWinnow.Models
         [JsonProperty("creationDate")]
         public string? CreationDate { get; set; }
     }
-        public enum DuplicateStatus
+    public enum DuplicateStatus
     {
         None,
         Strict,

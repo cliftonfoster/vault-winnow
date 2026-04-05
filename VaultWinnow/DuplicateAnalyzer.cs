@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using VaultWinnow.Models;
+﻿using VaultWinnow.Models;
 
 namespace VaultWinnow // use the same namespace as VaultItem
 {
@@ -216,6 +214,35 @@ namespace VaultWinnow // use the same namespace as VaultItem
                 }
             }
 
+            // Final pass: make DuplicateGroupSize match actual group size
+            var groupedDuplicates = itemList
+                .Where(i => i.DuplicateGroupId > 0)
+                .GroupBy(i => i.DuplicateGroupId);
+
+            foreach (var group in groupedDuplicates)
+            {
+                int size = group.Count();
+
+                foreach (var item in group)
+                {
+                    item.DuplicateGroupSize = size;
+                }
+            }
+
+            // Cleanup pass: no duplicate group should contain only one item.
+            var invalidSingleGroups = itemList
+                .Where(i => i.DuplicateGroupId > 0)
+                .GroupBy(i => i.DuplicateGroupId)
+                .Where(g => g.Count() == 1);
+
+            foreach (var group in invalidSingleGroups)
+            {
+                var item = group.First();
+                item.DuplicateStatus = DuplicateStatus.None;
+                item.DuplicateGroupSize = 0;
+                item.DuplicateGroupId = 0;
+            }
+
             foreach (var item in itemList)
             {
                 item.HasDuplicateAnalysis = true;
@@ -223,37 +250,56 @@ namespace VaultWinnow // use the same namespace as VaultItem
 
         }
 
-        private static string GetDiffCodes(VaultItem a, VaultItem b)
+        private static string GetDiffCodes(VaultItem? baseline, VaultItem? other)
         {
-            if (a == null || b == null)
+            if (baseline is null || other is null)
                 return string.Empty;
 
-            var codes = new List<string>();
+            static string Norm(string? value) => value?.Trim() ?? string.Empty;
+            static string NormLower(string? value) => value?.Trim().ToLowerInvariant() ?? string.Empty;
+            static bool HasTotp(VaultItem item) => !string.IsNullOrWhiteSpace(item.Login?.Totp);
+            static bool HasPasskey(VaultItem item) => item.HasPasskey;
 
-            if (!string.Equals(a.Name ?? string.Empty, b.Name ?? string.Empty, StringComparison.Ordinal))
-                codes.Add("N"); // Name
+            var baselineName = Norm(baseline.Name);
+            var otherName = Norm(other.Name);
 
-            if (!string.Equals(a.Username?.Trim() ?? string.Empty, b.Username?.Trim() ?? string.Empty, StringComparison.OrdinalIgnoreCase))
-                codes.Add("U"); // Username
+            var baselineUser = NormLower(baseline.Username);
+            var otherUser = NormLower(other.Username);
 
-            if (!string.Equals(a.Login?.Password ?? string.Empty, b.Login?.Password ?? string.Empty, StringComparison.Ordinal))
-                codes.Add("P"); // Password
+            var baselinePassword = baseline.Login?.Password ?? string.Empty;
+            var otherPassword = other.Login?.Password ?? string.Empty;
 
-            if (!string.Equals(a.Notes ?? string.Empty, b.Notes ?? string.Empty, StringComparison.Ordinal))
-                codes.Add("O"); // Notes
+            var baselineNotes = Norm(baseline.Notes);
+            var otherNotes = Norm(other.Notes);
 
-            bool aHasTotp = !string.IsNullOrWhiteSpace(a.Login?.Totp);
-            bool bHasTotp = !string.IsNullOrWhiteSpace(b.Login?.Totp);
-            string aTotp = a.Login?.Totp?.Trim() ?? string.Empty;
-            string bTotp = b.Login?.Totp?.Trim() ?? string.Empty;
+            var baselineTotp = HasTotp(baseline);
+            var otherTotp = HasTotp(other);
 
-            if (aHasTotp != bHasTotp || !string.Equals(aTotp, bTotp, StringComparison.Ordinal))
-                codes.Add("T"); // TOTP
+            var baselinePasskey = HasPasskey(baseline);
+            var otherPasskey = HasPasskey(other);
 
-            if (a.HasPasskey != b.HasPasskey)
-                codes.Add("K"); // Passkey / FIDO2
+            char n = string.Equals(baselineName, otherName, StringComparison.Ordinal) ? '-' : 'N';
+            char u = string.Equals(baselineUser, otherUser, StringComparison.Ordinal) ? '-' : 'U';
+            char p = string.Equals(baselinePassword, otherPassword, StringComparison.Ordinal) ? '-' : 'P';
+            char o = string.Equals(baselineNotes, otherNotes, StringComparison.Ordinal) ? '-' : 'O';
 
-            return string.Join(",", codes);
+            char t;
+            if (baselineTotp != otherTotp)
+                t = 'T';
+            else if (!baselineTotp && !otherTotp)
+                t = '.';
+            else
+                t = '-';
+
+            char k;
+            if (baselinePasskey != otherPasskey)
+                k = 'K';
+            else if (!baselinePasskey && !otherPasskey)
+                k = '.';
+            else
+                k = '-';
+
+            return $"{n}{u}{p}{o}{t}{k}";
         }
 
         public static string GetDiffCodeDescription(string? codes)

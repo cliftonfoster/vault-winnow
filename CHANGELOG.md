@@ -5,24 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [Unreleased]
 
 ### Added
-- xUnit coverage for selection helpers (Select All, Clear Selection, Invert Selection) to ensure they operate only on the currently visible, filtered items.
-- Extracted grid filtering logic into an ItemsFilterHelper so search text, type filters, and duplicate visibility are handled in one place.
+- Added `SelectionHelper` to centralize selection actions such as Select All, Clear Selection, Invert Selection, and Select Strict duplicates in view.
+- Added xUnit coverage for selection helper behavior, including Select All, Clear Selection, and Invert Selection operating only on currently visible items.
+- Added `ItemsFilterHelper` to centralize grid filtering logic for search text, type filters, and duplicate visibility.
+- Added selected-row comparison diff codes for duplicate groups, shown in the `Diff` column using a fixed six-character format in the order `NUPOTK`.
+- Added a tooltip to the `Diff` column header explaining the comparison code letters and their order.
+- Added same-group row highlighting so items in the selected duplicate group are easier to compare visually.
 
 ### Changed
-- Added a Close toolbar button and Ctrl+W shortcut to close the current file, with a confirmation if items are selected.
-- Disabled Select and Clear toolbar actions until a file is loaded, so the initial toolbar state matches available actions.
-- Centralized “no file loaded” UI reset into a single helper method to keep Open/Close/failure paths consistent.
-- Set the Options panel (type filters, duplicate toggle, column visibility) to start collapsed so the main grid is less visually busy by default.
-- Extracted selection-related logic into a dedicated SelectionHelper to keep MainWindow.xaml.cs smaller and easier to maintain, while preserving the existing runtime behavior for Select Strict.
-- Updated the type filter to correctly treat Logins, Secure Notes, Cards, and Identities as combinable flags, so checking multiple types only shows those selected item types.
+- Refactored selection-related logic out of `MainWindow.xaml.cs` into `SelectionHelper` to improve maintainability while preserving behavior.
+- Updated type filtering to correctly treat Logins, Secure Notes, Cards, and Identities as combinable flags.
+- Changed duplicate comparison in the grid from static merged diff summaries to dynamic per-selection comparison against the currently selected row.
+- Changed the `Diff` column to bind to a selection-based display property rather than stored aggregate codes.
+- Changed the `Diff` column presentation to use a monospace font for easier scanning of aligned comparison codes.
+- Changed the Analyze completion dialog to appear only once per session.
+- Changed the footer count text to show selected visible and hidden counts more clearly.
 
 ### Fixed
-- Standardized button click handler names (`BtnSomethingClick`) for consistency across the codebase.
-- Clarified tooltips for duplicate-related and MFA/Passkey columns so Strict/Almost/None and group/count semantics are easier to understand.
-- Fixed an issue where selecting multiple type filters (for example, Cards and Identities together) would incorrectly show all items instead of only the chosen types.
+- Fixed an issue where selecting multiple type filters could incorrectly show all items instead of only the chosen types.
+- Fixed ambiguity in Almost duplicate comparison by making the grid compare rows against the selected item within the same duplicate group.
+
 
 ## 0.4.0-beta - 2026-03-27
 

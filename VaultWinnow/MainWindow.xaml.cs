@@ -3,15 +3,12 @@ using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Xml;
-using  VaultWinnow.Models;
+using VaultWinnow.Models;
 using Formatting = Newtonsoft.Json.Formatting;
 
 namespace VaultWinnow
@@ -57,7 +54,7 @@ namespace VaultWinnow
 
             CloseCommand = new RelayCommand(_ => BtnCloseClick(this, new RoutedEventArgs()),
                     _ => BtnClose.IsEnabled);
-                    DataContext = this;
+            DataContext = this;
             Items = new ObservableCollection<VaultItem>();
 
 
@@ -456,13 +453,20 @@ namespace VaultWinnow
                 item.SelectedDiffCodes = string.Empty;
             }
 
-            if (_selectedComparisonItem is not null && _selectedDuplicateGroupId > 0)
+            if (_selectedComparisonItem is null || _selectedDuplicateGroupId <= 0)
             {
-                foreach (var item in _items.OfType<VaultItem>()
-                                          .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId))
-                {
-                    item.SelectedDiffCodes = GetDiffCodes(_selectedComparisonItem, item);
-                }
+                _itemsView?.Refresh();
+                return;
+            }
+
+            _selectedComparisonItem.SelectedDiffCodes =
+                GetDiffCodes(_selectedComparisonItem, _selectedComparisonItem);
+
+            foreach (var item in _items.OfType<VaultItem>()
+                                       .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
+                                                   !ReferenceEquals(i, _selectedComparisonItem)))
+            {
+                item.SelectedDiffCodes = GetDiffCodes(_selectedComparisonItem, item);
             }
 
             _itemsView?.Refresh();
@@ -559,16 +563,16 @@ namespace VaultWinnow
             BtnSelectStrictDuplicates.IsEnabled = true;
             ChkShowOnlyDuplicates.IsEnabled = true;
 
-if (!_hasShownAnalyzeCompletedMessage)
-{
-    MessageBox.Show(
-        "Duplicate analysis complete.\n\nUse the Duplicate and group columns, plus filters, to review results.",
-        "Analyze duplicates",
-        MessageBoxButton.OK,
-        MessageBoxImage.Information);
+            if (!_hasShownAnalyzeCompletedMessage)
+            {
+                MessageBox.Show(
+                    "Duplicate analysis complete.\n\nUse the Duplicate and group columns, plus filters, to review results.",
+                    "Analyze duplicates",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
 
-    _hasShownAnalyzeCompletedMessage = true;
-}
+                _hasShownAnalyzeCompletedMessage = true;
+            }
         }
 
         private void BtnDuplicateHelpClick(object sender, RoutedEventArgs e)
@@ -654,7 +658,7 @@ if (!_hasShownAnalyzeCompletedMessage)
             static string Norm(string? value) => value?.Trim() ?? string.Empty;
             static string NormLower(string? value) => value?.Trim().ToLowerInvariant() ?? string.Empty;
             static bool HasTotp(VaultItem item) => !string.IsNullOrWhiteSpace(item.Login?.Totp);
-            static bool HasPasskey(VaultItem item) => item.HasPasskey;
+
 
             var baselineName = Norm(baseline.Name);
             var otherName = Norm(other.Name);
@@ -671,8 +675,8 @@ if (!_hasShownAnalyzeCompletedMessage)
             var baselineTotp = HasTotp(baseline);
             var otherTotp = HasTotp(other);
 
-            var baselinePasskey = HasPasskey(baseline);
-            var otherPasskey = HasPasskey(other);
+            var baselinePasskey = baseline.HasPasskey;
+            var otherPasskey = other.HasPasskey;
 
             char n = string.Equals(baselineName, otherName, StringComparison.Ordinal) ? '-' : 'N';
             char u = string.Equals(baselineUser, otherUser, StringComparison.Ordinal) ? '-' : 'U';

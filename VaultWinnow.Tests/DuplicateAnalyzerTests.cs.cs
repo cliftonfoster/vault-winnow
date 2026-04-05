@@ -455,7 +455,69 @@ namespace VaultWinnow.Tests
             Assert.Equal(DuplicateStatus.None, items[1].DuplicateStatus);
         }
 
+        [Fact]
+        public void AnalyzeDuplicates_DoesNotLeaveSingleItemMarkedAsDuplicate()
+        {
+            // Arrange
+            var unique = new VaultItem
+            {
+                Name = "Unique Login",
+                Type = 1,
+                Notes = "only one of its kind",
+                Login = new VaultLogin
+                {
+                    Username = "only@example.com",
+                    Password = "NotShared123!",
+                    Totp = ""
+                }
+            };
 
+            var strictA = new VaultItem
+            {
+                Name = "Same Login",
+                Type = 1,
+                Notes = "same notes",
+                Login = new VaultLogin
+                {
+                    Username = "dup@example.com",
+                    Password = "SamePassword!",
+                    Totp = "ABC123"
+                }
+            };
+
+            var strictB = new VaultItem
+            {
+                Name = "Same Login",
+                Type = 1,
+                Notes = "same notes",
+                Login = new VaultLogin
+                {
+                    Username = "dup@example.com",
+                    Password = "SamePassword!",
+                    Totp = "ABC123"
+                }
+            };
+
+            var items = new List<VaultItem>
+    {
+        unique,
+        strictA,
+        strictB
+    };
+
+            // Act
+            DuplicateAnalyzer.AnalyzeDuplicates(items);
+
+            // Assert
+            Assert.Equal(DuplicateStatus.None, unique.DuplicateStatus);
+            Assert.Equal(0, unique.DuplicateGroupId);
+            Assert.Equal(0, unique.DuplicateGroupSize);
+
+            Assert.Equal(DuplicateStatus.Strict, strictA.DuplicateStatus);
+            Assert.Equal(DuplicateStatus.Strict, strictB.DuplicateStatus);
+            Assert.True(strictA.DuplicateGroupSize >= 2);
+            Assert.True(strictB.DuplicateGroupSize >= 2);
+        }
 
     }
 }

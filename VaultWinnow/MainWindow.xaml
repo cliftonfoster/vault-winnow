@@ -347,19 +347,18 @@
                         <Setter Property="Foreground" Value="Black" />
                         <Setter Property="FontWeight" Value="Normal" />
                         <Setter Property="BorderBrush" Value="Transparent" />
-                        <Setter Property="BorderThickness" Value="2" />
-
+                        <Setter Property="BorderThickness" Value="0" />
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}"
-                         Value="True">
-                                <Setter Property="Background" Value="#FFD6EBFF" />
+                            <!-- Related rows in the same duplicate group -->
+                            <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}" Value="True">
+                                <Setter Property="Background" Value="#FFDCEEFF" />
                             </DataTrigger>
 
-                            <Trigger Property="IsSelected"
-                     Value="True">
-                                <Setter Property="Background" Value="#FF7FB8F0" />
+                            <!-- Active selected row -->
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#FF8FC2F7" />
                                 <Setter Property="Foreground" Value="Black" />
-                                <Setter Property="BorderBrush" Value="#FF2F6FAE" />
+                                <Setter Property="FontWeight" Value="SemiBold" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -446,41 +445,52 @@
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Header="Diff"
-                    Binding="{Binding DiffDisplay}"
-                    Width="90"
-                    IsReadOnly="True">
+Binding="{Binding DiffDisplay}"
+Width="90"
+IsReadOnly="True">
                         <DataGridTextColumn.HeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="ToolTip">
                                     <Setter.Value>
                                         <ToolTip MaxWidth="260">
                                             <TextBlock TextWrapping="Wrap">
-                                                <Run Text="Difference code order:" FontWeight="Bold" />
-                                                <LineBreak />
-                                                <Run Text="N = Name" />
-                                                <LineBreak />
-                                                <Run Text="U = Username" />
-                                                <LineBreak />
-                                                <Run Text="P = Password" />
-                                                <LineBreak />
-                                                <Run Text="O = Notes" />
-                                                <LineBreak />
-                                                <Run Text="T = TOTP" />
-                                                <LineBreak />
-                                                <Run Text="K = Passkey" />
-                                                <LineBreak />
-                                                <Run Text="Dash (-) means no difference from the selected row." />
+        <Run Text="Difference code order:" FontWeight="Bold" />
+        <LineBreak />
+        <Run Text="N = Name differs" />
+        <LineBreak />
+        <Run Text="U = Username differs" />
+        <LineBreak />
+        <Run Text="P = Password differs" />
+        <LineBreak />
+        <Run Text="O = Notes differ" />
+        <LineBreak />
+        <Run Text="T = TOTP differs" />
+        <LineBreak />
+        <Run Text="K = Passkey differs" />
+        <LineBreak />
+        <Run Text="- = same as selected row" />
                                             </TextBlock>
                                         </ToolTip>
                                     </Setter.Value>
                                 </Setter>
                             </Style>
                         </DataGridTextColumn.HeaderStyle>
+
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
                                 <Setter Property="FontFamily" Value="Consolas" />
                                 <Setter Property="TextAlignment" Value="Left" />
                                 <Setter Property="VerticalAlignment" Value="Center" />
+                                <Setter Property="Foreground" Value="Black" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="Padding" Value="3,1,3,1" />
+
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}" Value="True">
+                                        <Setter Property="Foreground" Value="#ffffff" />
+                                        <Setter Property="Background" Value="#333399" />
+                                    </DataTrigger>
+                                </Style.Triggers>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>

@@ -3,7 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:VaultWinnow"
         Title="VaultWinnow"
-        Height="600" Width="1100"
+        Height="600"
+        Width="1100"
         WindowStartupLocation="CenterScreen">
 
     <Window.InputBindings>
@@ -13,7 +14,9 @@
                     Command="{Binding OpenCommand}" />
 
         <!-- Ctrl+W Close file -->
-        <KeyBinding Modifiers="Control" Key="W" Command="{Binding CloseCommand}" />
+        <KeyBinding Modifiers="Control"
+                    Key="W"
+                    Command="{Binding CloseCommand}" />
 
         <!-- Ctrl+E: Export Selected -->
         <KeyBinding Modifiers="Control"
@@ -82,19 +85,22 @@
 
     <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
             <!-- 0 Toolbar -->
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
             <!-- 1 Search -->
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
             <!-- 2 Options -->
-            <RowDefinition x:Name="GridRowMain" Height="*"/>
+            <RowDefinition x:Name="GridRowMain"
+                           Height="*" />
             <!-- 3 DataGrid -->
-            <RowDefinition x:Name="GridRowSplitter" Height="0"/>
+            <RowDefinition x:Name="GridRowSplitter"
+                           Height="0" />
             <!-- 4 Splitter -->
-            <RowDefinition x:Name="GridRowDetails" Height="0"/>
+            <RowDefinition x:Name="GridRowDetails"
+                           Height="0" />
             <!-- 5 Details -->
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
             <!-- 6 Footer -->
         </Grid.RowDefinitions>
 
@@ -355,22 +361,33 @@
                       SelectionChanged="ItemGrid_SelectionChanged">
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
-                        <Setter Property="Background" Value="White" />
-                        <Setter Property="Foreground" Value="Black" />
-                        <Setter Property="FontWeight" Value="Normal" />
-                        <Setter Property="BorderBrush" Value="Transparent" />
-                        <Setter Property="BorderThickness" Value="0" />
+                        <Setter Property="Background"
+                                Value="White" />
+                        <Setter Property="Foreground"
+                                Value="Black" />
+                        <Setter Property="FontWeight"
+                                Value="Normal" />
+                        <Setter Property="BorderBrush"
+                                Value="Transparent" />
+                        <Setter Property="BorderThickness"
+                                Value="0" />
                         <Style.Triggers>
                             <!-- Related rows in the same duplicate group -->
-                            <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}" Value="True">
-                                <Setter Property="Background" Value="#FFDCEEFF" />
+                            <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}"
+                                         Value="True">
+                                <Setter Property="Background"
+                                        Value="#FFDCEEFF" />
                             </DataTrigger>
 
                             <!-- Active selected row -->
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#FF8FC2F7" />
-                                <Setter Property="Foreground" Value="Black" />
-                                <Setter Property="FontWeight" Value="SemiBold" />
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter Property="Background"
+                                        Value="#FF8FC2F7" />
+                                <Setter Property="Foreground"
+                                        Value="Black" />
+                                <Setter Property="FontWeight"
+                                        Value="SemiBold" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -398,74 +415,75 @@
                     <DataGridTextColumn Header="Name"
                                         Binding="{Binding Name}"
                                         MinWidth="150"
-                                        Width="2*" 
+                                        Width="2*"
                                         IsReadOnly="True" />
 
-                        <DataGridTextColumn Header="Username"
-                                            Binding="{Binding Username}"
-                                            MinWidth="120"
-                                            Width="*"
-                                            IsReadOnly="True" />
+                    <DataGridTextColumn Header="Username"
+                                        Binding="{Binding Username}"
+                                        MinWidth="120"
+                                        Width="*"
+                                        IsReadOnly="True" />
 
-                        <DataGridTextColumn Header="Primary URI"
-                                            Binding="{Binding PrimaryUri}"
-                                            MinWidth="140"
-                                            Width="2*"
-                                            IsReadOnly="True" />
+                    <DataGridTextColumn Header="Primary URI"
+                                        Binding="{Binding PrimaryUri}"
+                                        MinWidth="140"
+                                        Width="2*"
+                                        IsReadOnly="True" />
 
-                        <!-- Small columns, fixed + MinWidth so headers don’t squash -->
-                        <DataGridTextColumn Header="Type"
-                                            Binding="{Binding TypeLabel}"
-                                            Width="70"
-                                            MinWidth="70"
-                                            IsReadOnly="True" />
+                    <!-- Small columns, fixed + MinWidth so headers don’t squash -->
+                    <DataGridTextColumn Header="Type"
+                                        Binding="{Binding TypeLabel}"
+                                        Width="70"
+                                        MinWidth="70"
+                                        IsReadOnly="True" />
 
                     <DataGridTextColumn Header="Dup"
                                         Binding="{Binding DuplicateStatusDisplay}"
                                         Width="80"
                                         IsReadOnly="True">
-                                            <DataGridTextColumn.HeaderStyle>
-                                                <Style TargetType="DataGridColumnHeader">
-                                                    <Setter Property="ToolTip"
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip"
                                         Value="Duplicate status for logins: Strict (safe auto‑select), Almost (needs review), or blank (no duplicates)." />
-                                                </Style>
-                                            </DataGridTextColumn.HeaderStyle>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Header="#Dup"
                                         Binding="{Binding DuplicateGroupSize}"
                                         Width="60"
                                         IsReadOnly="True">
-                                            <DataGridTextColumn.HeaderStyle>
-                                                <Style TargetType="DataGridColumnHeader">
-                                                    <Setter Property="ToolTip"
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip"
                                         Value="How many items are in this duplicate group. 1 means no duplicates; 2+ means multiple related logins." />
-                                                </Style>
-                                            </DataGridTextColumn.HeaderStyle>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Header="Grp"
                                         Binding="{Binding DuplicateGroupId}"
                                         Width="80"
                                         IsReadOnly="True">
-                                            <DataGridTextColumn.HeaderStyle>
-                                                <Style TargetType="DataGridColumnHeader">
-                                                    <Setter Property="ToolTip"
+                        <DataGridTextColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip"
                                         Value="Stable duplicate group id so related Strict/Almost logins stay together when sorted." />
-                                                </Style>
-                                            </DataGridTextColumn.HeaderStyle>
+                            </Style>
+                        </DataGridTextColumn.HeaderStyle>
                     </DataGridTextColumn>
 
                     <DataGridTemplateColumn Header="Diff"
-                        Width="90"
-                        IsReadOnly="True">
+                                            Width="90"
+                                            IsReadOnly="True">
                         <DataGridTemplateColumn.HeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="ToolTip">
                                     <Setter.Value>
                                         <ToolTip MaxWidth="260">
                                             <TextBlock TextWrapping="Wrap">
-                                                <Run Text="Difference code order:" FontWeight="Bold" />
+                                                <Run Text="Difference code order:"
+                                                     FontWeight="Bold" />
                                                 <LineBreak />
                                                 <Run Text="N = Name differs" />
                                                 <LineBreak />
@@ -490,68 +508,68 @@
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock FontFamily="Consolas"
-                                       TextAlignment="Left"
-                                       VerticalAlignment="Center"
-                                       Foreground="Black"
-                                       Background="Transparent"
-                                       Padding="3,1,3,1">
-<TextBlock FontFamily="Consolas"
-           TextAlignment="Left"
-           VerticalAlignment="Center"
-           Padding="3,1,3,1">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="Black" />
-                                                <Setter Property="Background" Value="Transparent" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}" Value="True">
-                                                        <Setter Property="Foreground" Value="#FFFFFF" />
-                                                        <Setter Property="Background" Value="#333399" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
+                                           TextAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           Padding="3,1,3,1">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground"
+                                                    Value="Black" />
+                                            <Setter Property="Background"
+                                                    Value="Transparent" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}"
+                                                             Value="True">
+                                                    <Setter Property="Foreground"
+                                                            Value="#FFFFFF" />
+                                                    <Setter Property="Background"
+                                                            Value="#333399" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
 
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource SelectedRowDiffMultiConverter}">
-                                                <Binding />
-                                                <Binding ElementName="ItemGrid" Path="SelectedItem" />
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-</TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource SelectedRowDiffMultiConverter}">
+                                            <Binding />
+                                            <Binding ElementName="ItemGrid"
+                                                     Path="SelectedItem" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
                                 </TextBlock>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
+
                     </DataGridTemplateColumn>
 
                     <DataGridTextColumn Header="Folder"
-                                            Binding="{Binding FolderName}"
-                                            Width="80"
-                                            MinWidth="50"
-                                            IsReadOnly="True" />
+                                        Binding="{Binding FolderName}"
+                                        Width="80"
+                                        MinWidth="50"
+                                        IsReadOnly="True" />
 
                     <DataGridCheckBoxColumn Header="MFA"
                                             Binding="{Binding HasTotp, Mode=OneWay}"
                                             Width="50"
                                             IsReadOnly="True">
-                                            <DataGridCheckBoxColumn.HeaderStyle>
-                                                <Style TargetType="DataGridColumnHeader">
-                                                    <Setter Property="ToolTip"
-                                            Value="Checked if this login has a TOTP MFA code configured." />
-                                                </Style>
-                                            </DataGridCheckBoxColumn.HeaderStyle>
+                        <DataGridCheckBoxColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip"
+                                        Value="Checked if this login has a TOTP MFA code configured." />
+                            </Style>
+                        </DataGridCheckBoxColumn.HeaderStyle>
                     </DataGridCheckBoxColumn>
 
                     <DataGridCheckBoxColumn Header="Passkey"
                                             Binding="{Binding HasPasskey, Mode=OneWay}"
                                             Width="70"
                                             IsReadOnly="True">
-                                            <DataGridCheckBoxColumn.HeaderStyle>
-                                                <Style TargetType="DataGridColumnHeader">
-                                                    <Setter Property="ToolTip"
-                                            Value="Checked if this login has any passkey (FIDO2) credentials." />
-                                                </Style>
-                                            </DataGridCheckBoxColumn.HeaderStyle>
+                        <DataGridCheckBoxColumn.HeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="ToolTip"
+                                        Value="Checked if this login has any passkey (FIDO2) credentials." />
+                            </Style>
+                        </DataGridCheckBoxColumn.HeaderStyle>
                     </DataGridCheckBoxColumn>
 
                 </DataGrid.Columns>
@@ -567,11 +585,13 @@
                    VerticalAlignment="Center">
                 <Image.Style>
                     <Style TargetType="Image">
-                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Setter Property="Visibility"
+                                Value="Collapsed" />
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding Items.Count}"
-                             Value="0">
-                                <Setter Property="Visibility" Value="Visible" />
+                                         Value="0">
+                                <Setter Property="Visibility"
+                                        Value="Visible" />
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -581,160 +601,264 @@
         </Grid>
 
         <GridSplitter Grid.Row="4"
-              Height="5"
-              HorizontalAlignment="Stretch"
-              VerticalAlignment="Center"
-              Background="#D0D0D0"
-              ResizeDirection="Rows"
-              ResizeBehavior="PreviousAndNext"
-              ShowsPreview="True"/>
+                      Height="5"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Center"
+                      Background="#D0D0D0"
+                      ResizeDirection="Rows"
+                      ResizeBehavior="PreviousAndNext"
+                      ShowsPreview="True" />
 
         <!-- Selected item details pane -->
         <Border Grid.Row="5"
-        Margin="0,6,0,0"
-        Padding="8"
-        BorderBrush="#FFB7B7C9"
-        BorderThickness="1"
-        Background="#FFF7F7FB">
+                Margin="0,6,0,0"
+                Padding="8"
+                BorderBrush="#FFB7B7C9"
+                BorderThickness="1"
+                Background="#FFF7F7FB">
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"
-                  HorizontalScrollBarVisibility="Disabled">
+                          HorizontalScrollBarVisibility="Disabled">
 
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <!-- Header with title + X -->
-                        <RowDefinition Height="*"/>
-                        <!-- Existing details content -->
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <!-- Header row: title + X -->
-                    <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                        <TextBlock Text="Selected Item Details"
-                           FontWeight="SemiBold"
-                           Foreground="DarkSlateBlue"
-                           VerticalAlignment="Center"
-                           DockPanel.Dock="Left"/>
+                    <Grid Grid.Row="0"
+                          Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <GroupBox Grid.Column="0"
+                                  Header="Selected item"
+                                  Margin="0,0,8,0">
+                            <Grid Margin="8"
+                                  DataContext="{Binding SelectedItem, ElementName=ItemGrid}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="90" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="0"
+                                           Text="Name:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="1"
+                                           Text="{Binding DisplayName}"
+                                           Margin="0,0,12,3" />
+
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="2"
+                                           Text="Type:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="0"
+                                           Grid.Column="3"
+                                           Text="{Binding TypeLabel}"
+                                           Margin="0,0,0,3" />
+
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="0"
+                                           Text="Username:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="1"
+                                           Text="{Binding Username}"
+                                           Margin="0,0,12,3" />
+
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="2"
+                                           Text="Folder:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="1"
+                                           Grid.Column="3"
+                                           Text="{Binding FolderName}"
+                                           Margin="0,0,0,3" />
+
+                                <TextBlock Grid.Row="2"
+                                           Grid.Column="0"
+                                           Text="Primary URI:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="2"
+                                           Grid.Column="1"
+                                           Grid.ColumnSpan="3"
+                                           Margin="0,0,0,3"
+                                           Text="{Binding PrimaryUri}"
+                                           TextWrapping="NoWrap"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip="{Binding PrimaryUri}" />
+
+                                <TextBlock Grid.Row="3"
+                                           Grid.Column="0"
+                                           Text="All URIs:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3"
+                                           VerticalAlignment="Top" />
+
+                                <ItemsControl Grid.Row="3"
+                                              Grid.Column="1"
+                                              Grid.ColumnSpan="3"
+                                              Margin="0,0,0,3"
+                                              ItemsSource="{Binding Login.Uris}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Uri}"
+                                                       TextWrapping="NoWrap"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip="{Binding Uri}"
+                                                       Margin="0,0,0,2" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <TextBlock Grid.Row="4"
+                                           Grid.Column="0"
+                                           Text="Password:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="4"
+                                           Grid.Column="1"
+                                           Text="{Binding PasswordSummary}"
+                                           Margin="0,0,12,3" />
+
+                                <TextBlock Grid.Row="4"
+                                           Grid.Column="2"
+                                           Text="TOTP:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="4"
+                                           Grid.Column="3"
+                                           Text="{Binding TotpDisplay}"
+                                           Margin="0,0,0,3" />
+
+                                <TextBlock Grid.Row="5"
+                                           Grid.Column="0"
+                                           Text="Passkeys:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="5"
+                                           Grid.Column="1"
+                                           Text="{Binding PasskeyCount}"
+                                           Margin="0,0,12,3" />
+
+                                <TextBlock Grid.Row="5"
+                                           Grid.Column="2"
+                                           Text="Dup status:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,3" />
+                                <TextBlock Grid.Row="5"
+                                           Grid.Column="3"
+                                           Text="{Binding DuplicateStatusDisplay}"
+                                           Margin="0,0,0,3" />
+
+                                <TextBlock Grid.Row="6"
+                                           Grid.Column="0"
+                                           Text="Notes:"
+                                           FontWeight="SemiBold"
+                                           Margin="0,0,6,0"
+                                           VerticalAlignment="Top" />
+                                <TextBox Grid.Row="6"
+                                         Grid.Column="1"
+                                         Grid.ColumnSpan="3"
+                                         Text="{Binding NotesDisplay, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         BorderThickness="0"
+                                         Background="Transparent"
+                                         TextWrapping="Wrap"
+                                         AcceptsReturn="True"
+                                         VerticalScrollBarVisibility="Auto"
+                                         MaxHeight="90" />
+                            </Grid>
+                        </GroupBox>
 
                         <Button x:Name="BtnCloseDetails"
-                        Content="✕"
-                        Width="22"
-                        Height="22"
-                        Padding="0"
-                        Margin="6,0,0,0"
-                        ToolTip="Close details pane"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Center"
-                        Click="BtnCloseDetailsClick"
-                        DockPanel.Dock="Right"/>
-                    </DockPanel>
+                                Grid.Column="1"
+                                Content="✕"
+                                Width="22"
+                                Height="22"
+                                Padding="0"
+                                Margin="0,2,0,0"
+                                ToolTip="Close details pane"
+                                VerticalAlignment="Top"
+                                Click="BtnCloseDetailsClick" />
+                    </Grid>
 
-                    <!-- Existing details content moved into Grid.Row=1 -->
                     <Grid Grid.Row="1">
-                        <!-- Now 4 rows: title, selected item grid, compared-items list, bottom note -->
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <!-- Row 0: title (keep, or remove if redundant with header) -->
-                        <TextBlock Grid.Row="0"
-                           Text="Selected item and comparisons"
-                           FontWeight="SemiBold"
-                           Foreground="DarkSlateBlue"
-                           Margin="0,0,0,6"/>
-
-                        <!-- Row 1: selected item metadata -->
-                        <Grid Grid.Row="1"
-                      DataContext="{Binding SelectedItem, ElementName=ItemGrid}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="90"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="90"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" FontWeight="SemiBold" Margin="0,0,6,4"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Name}" Margin="0,0,12,4"/>
-
-                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Username:" FontWeight="SemiBold" Margin="0,0,6,4"/>
-                            <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Username}" Margin="0,0,0,4"/>
-
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Primary URI:" FontWeight="SemiBold" Margin="0,0,6,4"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
-                               Margin="8,0,0,0"
-                               Text="{Binding PrimaryUri}"
-                               TextWrapping="NoWrap"
-                               TextTrimming="CharacterEllipsis"
-                               ToolTip="{Binding PrimaryUri}" />
-
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Dup status:" FontWeight="SemiBold" Margin="0,0,6,4"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding DuplicateStatusDisplay}" Margin="0,0,12,4"/>
-
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="Group:" FontWeight="SemiBold" Margin="0,0,6,4"/>
-                            <TextBlock Grid.Row="2" Grid.Column="3" Text="{Binding DuplicateGroupId}" Margin="0,0,0,4"/>
-
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="#Dup:" FontWeight="SemiBold" Margin="0,0,6,0"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DuplicateGroupSize}" Margin="0,0,12,0"/>
-
-                            <TextBlock Grid.Row="3" Grid.Column="2" Text="Diff:" FontWeight="SemiBold" Margin="0,0,6,0"/>
-                            <TextBlock Grid.Row="3"
-                               Grid.Column="3"
-                               Text="{Binding DiffDisplay}"
-                               FontFamily="Consolas"
-                               FontWeight="SemiBold"/>
-                        </Grid>
-
-                        <!-- Row 2: compared-items list -->
-                        <StackPanel Grid.Row="2" Margin="0,8,0,0">
-                            <TextBlock Text="Compared items in this group:"
-                               FontWeight="SemiBold"
-                               Margin="0,0,0,4"/>
-
-                            <ItemsControl ItemsSource="{Binding SelectedGroupItems}">
+                        <GroupBox Grid.Row="0"
+                                  Header="Compared items in this group"
+                                  Margin="0,0,0,0">
+                            <ItemsControl ItemsSource="{Binding SelectedGroupItems}"
+                                          Margin="8,4,8,6">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Margin="0,2,0,4">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Width="80"
-                                                   FontFamily="Consolas"
-                                                   FontWeight="SemiBold"
-                                                   Text="{Binding DiffDisplay}" />
+                                        <Border BorderBrush="#DDD"
+                                                BorderThickness="0,0,0,1"
+                                                Padding="0,4">
+                                            <StackPanel>
+                                                <DockPanel LastChildFill="False">
+                                                    <TextBlock Text="{Binding DisplayName}"
+                                                               FontWeight="SemiBold" />
+                                                    <TextBlock Text="{Binding SelectedDiffCodes}"
+                                                               Margin="12,0,0,0"
+                                                               FontFamily="Consolas"
+                                                               Foreground="DimGray" />
+                                                </DockPanel>
 
-                                                <TextBlock Width="220"
-                                                   Margin="8,0,0,0"
-                                                   Text="{Binding Name}" />
-
-                                                <TextBlock Width="260"
-                                                   Margin="8,0,0,0"
-                                                   Foreground="DimGray"
-                                                   Text="{Binding Username}" />
-
-                                                <TextBlock Margin="8,0,0,0"
-                                                   Foreground="DimGray"
-                                                   FontStyle="Italic"
-                                                   Text="{Binding DiffDisplayDescription}" />
+                                                <TextBlock Text="{Binding SelectedDiffSummary}"
+                                                           Margin="0,2,0,0"
+                                                           Foreground="DimGray"
+                                                           TextWrapping="Wrap" />
                                             </StackPanel>
-                                        </StackPanel>
+                                        </Border>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                        </StackPanel>
+                        </GroupBox>
 
-                        <!-- Row 3: bottom note -->
-                        <TextBlock Grid.Row="3"
-                           Margin="0,8,0,0"
-                           Foreground="DimGray"
-                           Text="This pane will expand to show more Almost-duplicate comparison detail."
-                           FontStyle="Italic"/>
+                        <TextBlock Grid.Row="1"
+                                   Margin="0,8,0,0"
+                                   Foreground="DimGray"
+                                   FontStyle="Italic"
+                                   TextWrapping="Wrap">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Text"
+                                            Value="Select a duplicate group item to compare its siblings here." />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedGroupItems.Count}"
+                                                     Value="0">
+                                            <Setter Property="Text"
+                                                    Value="No duplicate comparison data for this item." />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Grid>
                 </Grid>
             </ScrollViewer>
@@ -745,6 +869,6 @@
                    Name="TxtCount"
                    Text=""
                    Margin="0,6,0,0"
-                   Foreground="DarkSlateBlue"/>
+                   Foreground="DarkSlateBlue" />
     </Grid>
 </Window>

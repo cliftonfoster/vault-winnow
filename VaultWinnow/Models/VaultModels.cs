@@ -94,6 +94,44 @@ namespace VaultWinnow.Models
         // --- UI-only helpers, excluded from JSON output ---
 
         [JsonIgnore]
+        public string SelectedDiffSummary =>
+    DiffDisplayHelper.GetDescription(SelectedDiffCodes);
+
+        [JsonIgnore]
+        public string DisplayName =>
+            !string.IsNullOrWhiteSpace(Name)
+            ? Name!
+            : !string.IsNullOrWhiteSpace(Username)
+                ? Username!
+                : "(unnamed item)";
+
+        [JsonIgnore]
+        public string NotesDisplay =>
+            string.IsNullOrWhiteSpace(Notes) ? "(none)" : Notes!;
+
+        [JsonIgnore]
+        public string TotpDisplay =>
+            string.IsNullOrWhiteSpace(Login?.Totp) ? "(none)" : Login!.Totp!;
+
+        [JsonIgnore]
+        public int PasskeyCount =>
+            Login?.Fido2Credentials?.Count ?? 0;
+
+        [JsonIgnore]
+        public string AllUrisDisplay =>
+            Login?.Uris == null || Login.Uris.Count == 0
+                ? "(none)"
+                : string.Join(
+                    Environment.NewLine,
+                    Login.Uris
+                        .Where(u => !string.IsNullOrWhiteSpace(u.Uri))
+                        .Select(u => u.Uri));
+
+        [JsonIgnore]
+        public string PasswordSummary =>
+            string.IsNullOrEmpty(Login?.Password) ? "(none)" : "(present)";
+
+        [JsonIgnore]
         public DuplicateStatus DuplicateStatus { get; set; } = DuplicateStatus.None;
 
         [JsonIgnore]

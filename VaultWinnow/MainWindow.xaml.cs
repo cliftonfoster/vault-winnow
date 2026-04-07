@@ -86,13 +86,14 @@ namespace VaultWinnow
             }
         }
 
-        public IEnumerable<VaultItem> SelectedGroupItems =>
-    _selectedComparisonItem is null || _selectedDuplicateGroupId <= 0
-        ? Enumerable.Empty<VaultItem>()
-        : _items
-            .OfType<VaultItem>()
-            .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
-                        !ReferenceEquals(i, _selectedComparisonItem));
+        public List<VaultItem> SelectedGroupItems =>
+            _selectedComparisonItem is null || _selectedDuplicateGroupId <= 0
+                ? new List<VaultItem>()
+                : _items
+                    .OfType<VaultItem>()
+                    .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
+                                !ReferenceEquals(i, _selectedComparisonItem))
+                    .ToList();
 
 
         public MainWindow()
@@ -494,25 +495,33 @@ namespace VaultWinnow
 
             foreach (var item in _items.OfType<VaultItem>())
             {
-                item.IsInSelectedDuplicateGroup =
-                    _selectedDuplicateGroupId > 0 &&
-                    item.DuplicateGroupId == _selectedDuplicateGroupId;
-
+                item.IsInSelectedDuplicateGroup = false;
                 item.SelectedDiffCodes = string.Empty;
             }
 
             if (_selectedComparisonItem is null)
             {
                 HideDetailsPane();
+                OnPropertyChanged(nameof(SelectedGroupItems));
                 return;
             }
 
             ShowDetailsPane();
 
-            _selectedComparisonItem.SelectedDiffCodes =
-                GetDiffCodes(_selectedComparisonItem, _selectedComparisonItem);
+            if (_selectedDuplicateGroupId > 0)
+            {
+                var groupItems = _items
+                    .OfType<VaultItem>()
+                    .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId)
+                    .ToList();
 
-            CollectionViewSource.GetDefaultView(SelectedGroupItems).Refresh();
+                foreach (var item in groupItems)
+                {
+                    item.IsInSelectedDuplicateGroup = true;
+                    item.SelectedDiffCodes = GetDiffCodes(_selectedComparisonItem, item);
+                }
+            }
+
             OnPropertyChanged(nameof(SelectedGroupItems));
         }
 
@@ -743,14 +752,14 @@ namespace VaultWinnow
             if (ItemGrid == null)
                 return;
 
-            // Adjust indices if your column order changes
             // 0: checkbox, 1: Name, 2: Username, 3: Primary URI, 4: Type
             int dupIndex = 5;
             int dupCountIndex = 6;
             int dupGroupIndex = 7;
-            int folderIndex = 8;
-            int mfaIndex = 9;
-            int passkeyIndex = 10;
+            int diffIndex = 8;
+            int folderIndex = 9;
+            int mfaIndex = 10;
+            int passkeyIndex = 11;
 
             if (ItemGrid.Columns.Count > passkeyIndex)
             {
@@ -762,6 +771,14 @@ namespace VaultWinnow
 
                 ItemGrid.Columns[dupGroupIndex].Visibility =
                     ChkColDupGroup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+                // Diff is currently always visible; if you later add a checkbox, wire it here:
+                ItemGrid.Columns[diffIndex].Visibility = Visibility.Visible;
+
+                ItemGrid.Columns[folderIndex].Visibility =
+                    ChkColMfa.IsChecked == true || ChkColPasskey.IsChecked == true
+                        ? ItemGrid.Columns[folderIndex].Visibility
+                        : ItemGrid.Columns[folderIndex].Visibility;
 
                 ItemGrid.Columns[mfaIndex].Visibility =
                     ChkColMfa.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
@@ -840,12 +857,11 @@ namespace VaultWinnow
 
         private void ShowDetailsPane()
         {
-            if (GridRowDetails.Height.Value > 0)
-                return;
+            if (GridRowDetails.Height.Value > 0) return;
 
             GridRowMain.Height = new GridLength(3, GridUnitType.Star);
             GridRowSplitter.Height = new GridLength(5);
-            GridRowDetails.Height = new GridLength(1, GridUnitType.Star);
+            GridRowDetails.Height = new GridLength(2, GridUnitType.Star);
         }
 
         private void HideDetailsPane()

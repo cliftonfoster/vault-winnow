@@ -14,24 +14,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added selected-row comparison diff codes for duplicate groups, shown in the `Diff` column using a fixed six-character format in the order `NUPOTK`.
 - Added a tooltip to the `Diff` column header explaining the comparison code letters and their order.
 - Added same-group row highlighting so items in the selected duplicate group are easier to compare visually.
-- Selected-row comparison codes in the Diff column for duplicate groups, using a fixed `NUPOTK` format to show how each visible peer differs from the currently selected item.
-- A Diff column header tooltip explaining the comparison code order: Name, Username, Password, Notes, TOTP, and Passkey.
 
 ### Changed
 - Refactored selection-related logic out of `MainWindow.xaml.cs` into `SelectionHelper` to improve maintainability while preserving behavior.
 - Updated type filtering to correctly treat Logins, Secure Notes, Cards, and Identities as combinable flags.
 - Changed duplicate comparison in the grid from static merged diff summaries to dynamic per-selection comparison against the currently selected row.
 - Changed the `Diff` column to bind to a selection-based display property rather than stored aggregate codes.
-- Changed the `Diff` column presentation to use a monospace font for easier scanning of aligned comparison codes.
 - Changed the Analyze completion dialog to appear only once per session.
 - Changed the footer count text to show selected visible and hidden counts more clearly.
-- Reworked duplicate-group comparison in the main grid to calculate Diff values lazily per visible cell from the selected row, restoring fast selection while keeping group highlighting and comparison strings in sync.
-- Updated the Diff column presentation to use a monospace display and selected-group cell highlighting for easier visual scanning of duplicate differences.
+- Reworked the `Diff` column to use a monospace font and lazy per-cell comparison against the selected row, restoring fast selection while keeping group highlighting and comparison codes in sync.
 
 ### Fixed
 - Fixed an issue where selecting multiple type filters could incorrectly show all items instead of only the chosen types.
 - Fixed ambiguity in Almost duplicate comparison by making the grid compare rows against the selected item within the same duplicate group.
 - Fixed the selected-item details pane to stop showing a redundant “No differences” prose line when the selected row is compared to itself.
+
+## 0.4.0-beta - 2026-03-27
+
+### Added
+- Added a new `VaultWinnow.Tests` xUnit project with initial unit tests for Strict and Almost duplicate detection on Login items.
+- App and About dialog branding with the new VaultWinnow logo, including a larger logo and stacked version line in the About window.
+- Faded VaultWinnow logo watermark centered in the main DataGrid when no items are loaded, automatically hidden once a vault is opened.
+- Column visibility toggles for duplicate-related and MFA/Passkey columns, so users can hide Dup, Count, Group, MFA, and Passkey when not needed.
+- Collapsible “Options” panel that groups type filters, Show only duplicates, and column visibility controls to reduce vertical clutter while keeping filters close to the grid.
+
+### Changed
+- Refactored duplicate detection into a dedicated `DuplicateAnalyzer` helper class, independent of the WPF UI.
+- Tightened duplicate rules so TOTP value differences and passkey differences are treated as Almost, never Strict.
+- Added a “Dup Help” toolbar button and Duplicate Analysis Help window explaining Strict / Almost / None behavior.
+- Minor layout tweaks to the About window to improve readability and visual hierarchy.
+- Toolbar layout with grouped, color-coded icon+label buttons and increased button height for clearer, vertically stacked labels.
+- Main grid column widths (Name, Username, Primary URI, and small diagnostic columns) to start at sensible sizes and remain readable without manual resizing on load.
+- DataGrid configuration to better support horizontal scrolling and manual column resizing when users need more space for long URIs or names.
+
+### Fixed
+- Duplicate, Count, Group, MFA, and Passkey column headers no longer appear squashed on initial load; headers and tooltips are fully visible.
 
 ## 0.3.0-beta - 2026-03-22
 

@@ -145,7 +145,10 @@ namespace VaultWinnow.Models
         public string DiffDisplayDescription => DiffDisplayHelper.GetDescription(DiffDisplay);
 
         [JsonIgnore]
-        public string DiffDisplay => SelectedDiffCodes;
+        public string DiffDisplay =>
+            IsInSelectedDuplicateGroup
+                ? SelectedDiffCodes
+                : string.Empty;
 
         [JsonIgnore]
         private bool _isSelected;

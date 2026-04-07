@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added selected-row comparison diff codes for duplicate groups, shown in the `Diff` column using a fixed six-character format in the order `NUPOTK`.
 - Added a tooltip to the `Diff` column header explaining the comparison code letters and their order.
 - Added same-group row highlighting so items in the selected duplicate group are easier to compare visually.
+- Selected-row comparison codes in the Diff column for duplicate groups, using a fixed `NUPOTK` format to show how each visible peer differs from the currently selected item.
+- A Diff column header tooltip explaining the comparison code order: Name, Username, Password, Notes, TOTP, and Passkey.
 
 ### Changed
 - Refactored selection-related logic out of `MainWindow.xaml.cs` into `SelectionHelper` to improve maintainability while preserving behavior.
@@ -23,6 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed the `Diff` column presentation to use a monospace font for easier scanning of aligned comparison codes.
 - Changed the Analyze completion dialog to appear only once per session.
 - Changed the footer count text to show selected visible and hidden counts more clearly.
+- Reworked duplicate-group comparison in the main grid to calculate Diff values lazily per visible cell from the selected row, restoring fast selection while keeping group highlighting and comparison strings in sync.
+- Updated the Diff column presentation to use a monospace display and selected-group cell highlighting for easier visual scanning of duplicate differences.
 
 ### Fixed
 - Fixed an issue where selecting multiple type filters could incorrectly show all items instead of only the chosen types.

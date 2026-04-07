@@ -504,7 +504,6 @@ namespace VaultWinnow
             if (_selectedComparisonItem is null)
             {
                 HideDetailsPane();
-                //_itemsView?.Refresh();
                 return;
             }
 
@@ -513,14 +512,6 @@ namespace VaultWinnow
             _selectedComparisonItem.SelectedDiffCodes =
                 GetDiffCodes(_selectedComparisonItem, _selectedComparisonItem);
 
-            //foreach (var item in _items.OfType<VaultItem>()
-            //                           .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
-            //                                       !ReferenceEquals(i, _selectedComparisonItem)))
-            //{
-            //    item.SelectedDiffCodes = GetDiffCodes(_selectedComparisonItem, item);
-            //}
-
-            //_itemsView?.Refresh();
             CollectionViewSource.GetDefaultView(SelectedGroupItems).Refresh();
             OnPropertyChanged(nameof(SelectedGroupItems));
         }

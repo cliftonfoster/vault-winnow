@@ -1,6 +1,7 @@
 ﻿<Window x:Class="VaultWinnow.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:VaultWinnow"
         Title="VaultWinnow"
         Height="600" Width="1100"
         WindowStartupLocation="CenterScreen">
@@ -65,7 +66,7 @@
                                    Height="28"
                                    Margin="0,0,0,2"
                                    Source="{Binding RelativeSource={RelativeSource AncestorType=Button},
-                                                    Path=Tag}" />       
+                                                    Path=Tag}" />
                             <TextBlock HorizontalAlignment="Center"
                                        FontSize="11"
                                        Text="{Binding RelativeSource={RelativeSource AncestorType=Button},
@@ -75,6 +76,8 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <local:SelectedRowDiffConverter x:Key="SelectedRowDiffConverter" />
+        <local:SelectedRowDiffMultiConverter x:Key="SelectedRowDiffMultiConverter" />
     </Window.Resources>
 
     <Grid Margin="10">
@@ -453,56 +456,73 @@
                                             </DataGridTextColumn.HeaderStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Diff"
-                        Binding="{Binding DiffDisplay}"
+                    <DataGridTemplateColumn Header="Diff"
                         Width="90"
                         IsReadOnly="True">
-                        <DataGridTextColumn.HeaderStyle>
+                        <DataGridTemplateColumn.HeaderStyle>
                             <Style TargetType="DataGridColumnHeader">
                                 <Setter Property="ToolTip">
                                     <Setter.Value>
                                         <ToolTip MaxWidth="260">
                                             <TextBlock TextWrapping="Wrap">
-        <Run Text="Difference code order:" FontWeight="Bold" />
-        <LineBreak />
-        <Run Text="N = Name differs" />
-        <LineBreak />
-        <Run Text="U = Username differs" />
-        <LineBreak />
-        <Run Text="P = Password differs" />
-        <LineBreak />
-        <Run Text="O = Notes differ" />
-        <LineBreak />
-        <Run Text="T = TOTP differs" />
-        <LineBreak />
-        <Run Text="K = Passkey differs" />
-        <LineBreak />
-        <Run Text="- = same as selected row" />
+                                                <Run Text="Difference code order:" FontWeight="Bold" />
+                                                <LineBreak />
+                                                <Run Text="N = Name differs" />
+                                                <LineBreak />
+                                                <Run Text="U = Username differs" />
+                                                <LineBreak />
+                                                <Run Text="P = Password differs" />
+                                                <LineBreak />
+                                                <Run Text="O = Notes differ" />
+                                                <LineBreak />
+                                                <Run Text="T = TOTP differs" />
+                                                <LineBreak />
+                                                <Run Text="K = Passkey differs" />
+                                                <LineBreak />
+                                                <Run Text="- = same as selected row" />
                                             </TextBlock>
                                         </ToolTip>
                                     </Setter.Value>
                                 </Setter>
                             </Style>
-                        </DataGridTextColumn.HeaderStyle>
+                        </DataGridTemplateColumn.HeaderStyle>
 
-                        <DataGridTextColumn.ElementStyle>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="FontFamily" Value="Consolas" />
-                                <Setter Property="TextAlignment" Value="Left" />
-                                <Setter Property="VerticalAlignment" Value="Center" />
-                                <Setter Property="Foreground" Value="Black" />
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="Padding" Value="3,1,3,1" />
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock FontFamily="Consolas"
+                                       TextAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       Foreground="Black"
+                                       Background="Transparent"
+                                       Padding="3,1,3,1">
+<TextBlock FontFamily="Consolas"
+           TextAlignment="Left"
+           VerticalAlignment="Center"
+           Padding="3,1,3,1">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="Black" />
+                                                <Setter Property="Background" Value="Transparent" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}" Value="True">
+                                                        <Setter Property="Foreground" Value="#FFFFFF" />
+                                                        <Setter Property="Background" Value="#333399" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
 
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsInSelectedDuplicateGroup}" Value="True">
-                                        <Setter Property="Foreground" Value="#ffffff" />
-                                        <Setter Property="Background" Value="#333399" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGridTextColumn.ElementStyle>
-                    </DataGridTextColumn>
+                                        <TextBlock.Text>
+                                            <MultiBinding Converter="{StaticResource SelectedRowDiffMultiConverter}">
+                                                <Binding />
+                                                <Binding ElementName="ItemGrid" Path="SelectedItem" />
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+</TextBlock>
+                                </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
                     <DataGridTextColumn Header="Folder"
                                             Binding="{Binding FolderName}"

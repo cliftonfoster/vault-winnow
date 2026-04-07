@@ -13,8 +13,11 @@ using Formatting = Newtonsoft.Json.Formatting;
 
 namespace VaultWinnow
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged(string name) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         private VaultExport? _loadedExport;
         private ObservableCollection<VaultItem> _items = new();
         private ICollectionView? _itemsView;
@@ -48,6 +51,50 @@ namespace VaultWinnow
             All = Login | SecureNote | Card | Identity
         }
 
+        public string SelectedGroupComparisonSummary
+        {
+            get
+            {
+                if (_selectedComparisonItem is null || _selectedDuplicateGroupId <= 0)
+                    return string.Empty;
+
+                var others = _items
+                    .OfType<VaultItem>()
+                    .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
+                                !ReferenceEquals(i, _selectedComparisonItem))
+                    .ToList();
+
+                if (others.Count == 0)
+                    return string.Empty;
+
+                var lines = new List<string>();
+
+                foreach (var item in others)
+                {
+                    var label = !string.IsNullOrWhiteSpace(item.Name)
+                        ? item.Name
+                        : item.Username ?? "(unnamed item)";
+
+                    var diff = string.IsNullOrWhiteSpace(item.SelectedDiffCodes)
+                        ? string.Empty
+                        : item.SelectedDiffCodes;
+
+                    lines.Add($"{label}  [{diff}]");
+                }
+
+                return string.Join(Environment.NewLine, lines);
+            }
+        }
+
+        public IEnumerable<VaultItem> SelectedGroupItems =>
+    _selectedComparisonItem is null || _selectedDuplicateGroupId <= 0
+        ? Enumerable.Empty<VaultItem>()
+        : _items
+            .OfType<VaultItem>()
+            .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
+                        !ReferenceEquals(i, _selectedComparisonItem));
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -80,6 +127,7 @@ namespace VaultWinnow
             DataContext = this;
 
             ResetUiToNoFileState();
+            HideDetailsPane();
         }
 
 
@@ -453,23 +501,28 @@ namespace VaultWinnow
                 item.SelectedDiffCodes = string.Empty;
             }
 
-            if (_selectedComparisonItem is null || _selectedDuplicateGroupId <= 0)
+            if (_selectedComparisonItem is null)
             {
-                _itemsView?.Refresh();
+                HideDetailsPane();
+                //_itemsView?.Refresh();
                 return;
             }
+
+            ShowDetailsPane();
 
             _selectedComparisonItem.SelectedDiffCodes =
                 GetDiffCodes(_selectedComparisonItem, _selectedComparisonItem);
 
-            foreach (var item in _items.OfType<VaultItem>()
-                                       .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
-                                                   !ReferenceEquals(i, _selectedComparisonItem)))
-            {
-                item.SelectedDiffCodes = GetDiffCodes(_selectedComparisonItem, item);
-            }
+            //foreach (var item in _items.OfType<VaultItem>()
+            //                           .Where(i => i.DuplicateGroupId == _selectedDuplicateGroupId &&
+            //                                       !ReferenceEquals(i, _selectedComparisonItem)))
+            //{
+            //    item.SelectedDiffCodes = GetDiffCodes(_selectedComparisonItem, item);
+            //}
 
-            _itemsView?.Refresh();
+            //_itemsView?.Refresh();
+            CollectionViewSource.GetDefaultView(SelectedGroupItems).Refresh();
+            OnPropertyChanged(nameof(SelectedGroupItems));
         }
 
         private void BtnSelectAllClick(object sender, RoutedEventArgs e)
@@ -499,6 +552,12 @@ namespace VaultWinnow
             about.ShowDialog();
         }
 
+        private void BtnCloseDetailsClick(object sender, RoutedEventArgs e)
+        {
+            ItemGrid.SelectedItem = null;
+            HideDetailsPane();
+            _itemsView?.Refresh();
+        }
 
         private void UpdateTypeFilterFromCheckboxes()
         {
@@ -731,6 +790,10 @@ namespace VaultWinnow
                 _itemsView.Refresh();
             }
 
+            HideDetailsPane();
+            _selectedComparisonItem = null;
+            _selectedDuplicateGroupId = 0;
+
             // Reset filters / search
             TxtSearch.Text = string.Empty;
 
@@ -784,6 +847,22 @@ namespace VaultWinnow
                 : "Different: " + string.Join(", ", parts);
         }
 
+        private void ShowDetailsPane()
+        {
+            if (GridRowDetails.Height.Value > 0)
+                return;
+
+            GridRowMain.Height = new GridLength(3, GridUnitType.Star);
+            GridRowSplitter.Height = new GridLength(5);
+            GridRowDetails.Height = new GridLength(1, GridUnitType.Star);
+        }
+
+        private void HideDetailsPane()
+        {
+            GridRowMain.Height = new GridLength(1, GridUnitType.Star);
+            GridRowSplitter.Height = new GridLength(0);
+            GridRowDetails.Height = new GridLength(0);
+        }
     }
 
 }

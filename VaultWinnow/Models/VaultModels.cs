@@ -106,7 +106,21 @@ namespace VaultWinnow.Models
         public string DuplicateDiffDescription => DuplicateAnalyzer.GetDiffCodeDescription(DuplicateDiffCodes);
 
         [JsonIgnore]
-        public bool IsInSelectedDuplicateGroup { get; set; }
+        private bool _isInSelectedDuplicateGroup;
+
+        [JsonIgnore]
+        public bool IsInSelectedDuplicateGroup
+        {
+            get => _isInSelectedDuplicateGroup;
+            set
+            {
+                if (_isInSelectedDuplicateGroup != value)
+                {
+                    _isInSelectedDuplicateGroup = value;
+                    OnPropertyChanged(nameof(IsInSelectedDuplicateGroup));
+                }
+            }
+        }
 
         [JsonIgnore]
         private string _selectedDiffCodes = string.Empty;

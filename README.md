@@ -56,6 +56,8 @@ Duplicate analysis for logins
 - Almost: same site but important details differ (name, password, notes, 2FA/TOTP, or passkeys) – always review manually.  
 - None: everything else, including reused passwords on different sites and non-login items.  
 - A “Dup”, “Count”, and “Group” column show status, group size, and a stable group id so related Strict/Almost entries stay adjacent when sorted.  
+- The `Diff` column shows a fixed six-character comparison code in `NUPOTK` order for items in the selected duplicate group, comparing each row against the currently selected row.  
+- Rows in the selected duplicate group are lightly highlighted to make visual comparison easier.  
 - A “Show only duplicates” toggle filters the view to Strict/Almost items, combined with existing search and type filters.
 
 Toolbar icons and shortcuts  

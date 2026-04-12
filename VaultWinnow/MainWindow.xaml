@@ -813,12 +813,12 @@
                                   Header="Compared items in this group"
                                   Margin="0,0,0,0">
                             <ItemsControl ItemsSource="{Binding SelectedGroupItems}"
-                                          Margin="8,4,8,6">
+                                          Margin="8,2,8,6">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Border BorderBrush="#DDD"
                                                 BorderThickness="0,0,0,1"
-                                                Padding="0,4">
+                                                Padding="0,2">
                                             <StackPanel>
                                                 <DockPanel LastChildFill="False">
                                                     <TextBlock Text="{Binding DisplayName}"
@@ -827,12 +827,11 @@
                                                                Margin="12,0,0,0"
                                                                FontFamily="Consolas"
                                                                Foreground="DimGray" />
+                                                    <TextBlock Text="{Binding SelectedDiffSummary}"
+                                                               Margin="12,0,0,0"
+                                                               Foreground="DimGray"
+                                                               TextWrapping="Wrap" />
                                                 </DockPanel>
-
-                                                <TextBlock Text="{Binding SelectedDiffSummary}"
-                                                           Margin="0,2,0,0"
-                                                           Foreground="DimGray"
-                                                           TextWrapping="Wrap" />
                                             </StackPanel>
                                         </Border>
                                     </DataTemplate>

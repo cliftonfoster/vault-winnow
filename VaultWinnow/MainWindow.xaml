@@ -255,10 +255,14 @@
         </StackPanel>
 
         <!-- Filters and column options (collapsible) -->
-        <Expander Grid.Row="2"
+        <Expander x:Name="ExpOptions"
+                  Grid.Row="2"
                   Header="Options"
                   IsExpanded="False"
+                  Expanded="ExpOptions_ExpandedCollapsed"
+                  Collapsed="ExpOptions_ExpandedCollapsed"
                   Margin="0,0,0,4">
+            
             <StackPanel Orientation="Vertical">
 
                 <!-- Types row -->
@@ -327,6 +331,20 @@
 
                     <CheckBox x:Name="ChkColDupGroup"
                               Content="Grp"
+                              IsChecked="True"
+                              Margin="0,0,6,0"
+                              Checked="ColumnVisibilityChanged"
+                              Unchecked="ColumnVisibilityChanged" />
+
+                    <CheckBox x:Name="ChkColDiff"
+                              Content="Diff"
+                              IsChecked="True"
+                              Margin="0,0,6,0"
+                              Checked="ColumnVisibilityChanged"
+                              Unchecked="ColumnVisibilityChanged" />
+
+                    <CheckBox x:Name="ChkColFolder"
+                              Content="Folder"
                               IsChecked="True"
                               Margin="0,0,6,0"
                               Checked="ColumnVisibilityChanged"

@@ -33,6 +33,21 @@ namespace VaultWinnow
         private bool _hasShownAnalyzeCompletedMessage;
         private VaultItem? _selectedComparisonItem;
         private int _selectedDuplicateGroupId;
+        private AppSettings appSettings = new();
+        private bool _isApplyingSettings;
+
+        private const int ColumnIndexSelect = 0;
+        private const int ColumnIndexName = 1;
+        private const int ColumnIndexUsername = 2;
+        private const int ColumnIndexPrimaryUri = 3;
+        private const int ColumnIndexType = 4;
+        private const int ColumnIndexDup = 5;
+        private const int ColumnIndexDupCount = 6;
+        private const int ColumnIndexDupGroup = 7;
+        private const int ColumnIndexDiff = 8;
+        private const int ColumnIndexFolder = 9;
+        private const int ColumnIndexMfa = 10;
+        private const int ColumnIndexPasskey = 11;
 
         public ObservableCollection<VaultItem> Items
         {
@@ -100,35 +115,75 @@ namespace VaultWinnow
         {
             InitializeComponent();
 
-            CloseCommand = new RelayCommand(_ => BtnCloseClick(this, new RoutedEventArgs()),
-                    _ => BtnClose.IsEnabled);
+            appSettings = SettingsService.Load();
+
+            CloseCommand = new RelayCommand(_ => BtnCloseClick(this, new RoutedEventArgs()), _ => BtnClose.IsEnabled);
+
             DataContext = this;
             Items = new ObservableCollection<VaultItem>();
-
 
             ItemGrid.ItemsSource = _items;
             _itemsView = CollectionViewSource.GetDefaultView(_items);
             if (_itemsView != null)
                 _itemsView.Filter = ItemsFilter;
 
-            // Commands for keyboard shortcuts
-            OpenCommand = new RelayCommand(_ => BtnOpenClick(this, new RoutedEventArgs()),
-                                           _ => BtnOpen.IsEnabled);
-            ExportCommand = new RelayCommand(_ => BtnExportClick(this, new RoutedEventArgs()),
-                                             _ => BtnExport.IsEnabled);
-            CopyCommand = new RelayCommand(_ => BtnCopyToClipboardClick(this, new RoutedEventArgs()),
-                                           _ => BtnCopyToClipboard.IsEnabled);
-            SelectAllCommand = new RelayCommand(_ => BtnSelectAllClick(this, new RoutedEventArgs()),
-                                                _ => BtnSelectAll.IsEnabled);
-            ClearSelectionCommand = new RelayCommand(_ => BtnClearSelectionClick(this, new RoutedEventArgs()),
-                                                     _ => BtnClearSelection.IsEnabled);
-
-            DataContext = this;
+            OpenCommand = new RelayCommand(_ => BtnOpenClick(this, new RoutedEventArgs()), _ => BtnOpen.IsEnabled);
+            ExportCommand = new RelayCommand(_ => BtnExportClick(this, new RoutedEventArgs()), _ => BtnExport.IsEnabled);
+            CopyCommand = new RelayCommand(_ => BtnCopyToClipboardClick(this, new RoutedEventArgs()), _ => BtnCopyToClipboard.IsEnabled);
+            SelectAllCommand = new RelayCommand(_ => BtnSelectAllClick(this, new RoutedEventArgs()), _ => BtnSelectAll.IsEnabled);
+            ClearSelectionCommand = new RelayCommand(_ => BtnClearSelectionClick(this, new RoutedEventArgs()), _ => BtnClearSelection.IsEnabled);
 
             DataContext = this;
 
             ResetUiToNoFileState();
             HideDetailsPane();
+
+            ApplySavedSettings();
+        }
+
+        private void ApplySavedSettings()
+        {
+            if (appSettings == null)
+                return;
+
+            _isApplyingSettings = true;
+
+            try
+            {
+                ExpOptions.IsExpanded = appSettings.OptionsExpanded;
+
+                ChkColDup.IsChecked = appSettings.ShowDuplicateColumn;
+                ChkColDupCount.IsChecked = appSettings.ShowDuplicateCountColumn;
+                ChkColDupGroup.IsChecked = appSettings.ShowDuplicateGroupColumn;
+                ChkColDiff.IsChecked = appSettings.ShowDiffColumn;
+                ChkColFolder.IsChecked = appSettings.ShowFolderColumn;
+                ChkColMfa.IsChecked = appSettings.ShowMfaColumn;
+                ChkColPasskey.IsChecked = appSettings.ShowPasskeyColumn;
+
+                ColumnVisibilityChanged(this, new RoutedEventArgs());
+            }
+            finally
+            {
+                _isApplyingSettings = false;
+            }
+        }
+
+        private void SaveCurrentSettings()
+        {
+            if (appSettings == null)
+                return;
+
+            appSettings.OptionsExpanded = ExpOptions?.IsExpanded == true;
+
+            appSettings.ShowDuplicateColumn = ChkColDup?.IsChecked == true;
+            appSettings.ShowDuplicateCountColumn = ChkColDupCount?.IsChecked == true;
+            appSettings.ShowDuplicateGroupColumn = ChkColDupGroup?.IsChecked == true;
+            appSettings.ShowDiffColumn = ChkColDiff?.IsChecked == true;
+            appSettings.ShowFolderColumn = ChkColFolder?.IsChecked == true;
+            appSettings.ShowMfaColumn = ChkColMfa?.IsChecked == true;
+            appSettings.ShowPasskeyColumn = ChkColPasskey?.IsChecked == true;
+
+            SettingsService.Save(appSettings);
         }
 
 
@@ -752,40 +807,64 @@ namespace VaultWinnow
             if (ItemGrid == null)
                 return;
 
-            // 0: checkbox, 1: Name, 2: Username, 3: Primary URI, 4: Type
-            int dupIndex = 5;
-            int dupCountIndex = 6;
-            int dupGroupIndex = 7;
-            int diffIndex = 8;
-            int folderIndex = 9;
-            int mfaIndex = 10;
-            int passkeyIndex = 11;
+            if (ItemGrid.Columns.Count <= ColumnIndexPasskey)
+                return;
 
-            if (ItemGrid.Columns.Count > passkeyIndex)
+            ItemGrid.Columns[ColumnIndexDup].Visibility =
+                ChkColDup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexDupCount].Visibility =
+                ChkColDupCount.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexDupGroup].Visibility =
+                ChkColDupGroup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexDiff].Visibility =
+                ChkColDiff.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexFolder].Visibility =
+                ChkColFolder.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexMfa].Visibility =
+                ChkColMfa.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexPasskey].Visibility =
+                ChkColPasskey.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            if (!_isApplyingSettings)
             {
-                ItemGrid.Columns[dupIndex].Visibility =
-                    ChkColDup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-
-                ItemGrid.Columns[dupCountIndex].Visibility =
-                    ChkColDupCount.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-
-                ItemGrid.Columns[dupGroupIndex].Visibility =
-                    ChkColDupGroup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-
-                // Diff is currently always visible; if you later add a checkbox, wire it here:
-                ItemGrid.Columns[diffIndex].Visibility = Visibility.Visible;
-
-                ItemGrid.Columns[folderIndex].Visibility =
-                    ChkColMfa.IsChecked == true || ChkColPasskey.IsChecked == true
-                        ? ItemGrid.Columns[folderIndex].Visibility
-                        : ItemGrid.Columns[folderIndex].Visibility;
-
-                ItemGrid.Columns[mfaIndex].Visibility =
-                    ChkColMfa.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
-
-                ItemGrid.Columns[passkeyIndex].Visibility =
-                    ChkColPasskey.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+                SaveCurrentSettings();
             }
+        }
+
+        private void ApplyColumnVisibilityFromCheckboxes()
+        {
+            if (ItemGrid == null)
+                return;
+
+            if (ItemGrid.Columns.Count <= ColumnIndexPasskey)
+                return;
+
+            ItemGrid.Columns[ColumnIndexDup].Visibility =
+                ChkColDup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexDupCount].Visibility =
+                ChkColDupCount.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexDupGroup].Visibility =
+                ChkColDupGroup.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexDiff].Visibility =
+                ChkColDiff.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexFolder].Visibility =
+                ChkColFolder.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexMfa].Visibility =
+                ChkColMfa.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
+
+            ItemGrid.Columns[ColumnIndexPasskey].Visibility =
+                ChkColPasskey.IsChecked == true ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void ResetUiToNoFileState()
@@ -869,6 +948,14 @@ namespace VaultWinnow
             GridRowMain.Height = new GridLength(1, GridUnitType.Star);
             GridRowSplitter.Height = new GridLength(0);
             GridRowDetails.Height = new GridLength(0);
+        }
+
+        private void ExpOptions_ExpandedCollapsed(object sender, RoutedEventArgs e)
+        {
+            if (_isApplyingSettings)
+                return;
+
+            SaveCurrentSettings();
         }
     }
 

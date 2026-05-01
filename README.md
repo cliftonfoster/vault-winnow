@@ -180,11 +180,11 @@ The JSON model layer is intentionally close to the Bitwarden/Vaultwarden export
 
 ## Antivirus & Integrity
 
-- SHA-256 (VaultWinnow-0.4.0-beta.exe):  
-  `599529117c5207041db5680be8cf77153c1190e561e3ec7c71df4c4f09de6bed`
+- SHA-256 (VaultWinnow.exe, 0.5.0-beta):  
+  `AC506A97D6668013E4B3EFD8655D64B2549122511B601903A3940F750E14ECBF`
 
 - VirusTotal:  
-  🛡️ [Scan results for VaultWinnow-0.4.0-beta.exe](https://www.virustotal.com/gui/file/599529117c5207041db5680be8cf77153c1190e561e3ec7c71df4c4f09de6bed)
+  🛡️ [Scan results for VaultWinnow.exe (0.5.0-beta)](https://www.virustotal.com/gui/file/ac506a97d6668013e4b3efd8655d64b2549122511b601903a3940f750e14ecbf)
 
 ------
 
